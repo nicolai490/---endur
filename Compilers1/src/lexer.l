@@ -23,3 +23,9 @@ optional_exponent   ("E"("+"|"-"|""){int_num})|""
 real_num            {int_num}{optional_fraction}{optional_exponent}
 
 %%
+
+.       {printf("Just a test");}
+
+%%
+
+int yywrap(void){return 1;}
