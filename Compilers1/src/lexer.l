@@ -10,8 +10,6 @@ OpType Oper=op_NONE;
 DataType Type=dt_NONE;
 %}
 
-%option main
-
 letter  [A-Za-z]
 digit   [0-9]
 id      {letter}({letter}|{digit})*
@@ -27,5 +25,3 @@ real_num            {int_num}{optional_fraction}{optional_exponent}
 .       {printf("Just a test");}
 
 %%
-
-int yywrap(void){return 1;}

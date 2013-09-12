@@ -540,7 +540,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 25 "lexer.l"
+#line 23 "lexer.l"
 
 
 #line 547 "lex.yy.cc"
@@ -638,12 +638,12 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 27 "lexer.l"
+#line 25 "lexer.l"
 {printf("Just a test");}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 29 "lexer.l"
+#line 27 "lexer.l"
 ECHO;
 	YY_BREAK
 #line 650 "lex.yy.cc"
@@ -1555,19 +1555,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-int main (void);
-
-int main ()
-{
-
-	yylex();
-
-	return 0;
-}
-
-#line 29 "lexer.l"
+#line 27 "lexer.l"
 
 
-
-int yywrap(void){return 1;}
 
