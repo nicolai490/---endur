@@ -22,6 +22,7 @@ SymbolTable* Scanner::getSymbolTable(void){
 }
 
 void Scanner::setCurrentToken(TokenCode tc, DataType dt, OpType op){
+	//printf("Creating token %d %d %d\n", tc, dt, op);
 	m_currentToken = *(new Token());
 	m_currentToken.setTokenCode(tc);
 	m_currentToken.setDataType(dt);
@@ -29,16 +30,27 @@ void Scanner::setCurrentToken(TokenCode tc, DataType dt, OpType op){
 }
 
 void Scanner::setCurrentToken(TokenCode tc, DataType dt, const std::string& lexeme){
+	//printf("Creating token %d %d 5\n", tc, dt);
 	m_currentToken = *(new Token());
 	m_currentToken.setTokenCode(tc);
 	m_currentToken.setDataType(dt);
 	m_currentToken.setOpType(op_NONE);
-	SymbolTableEntry* entry = m_symbolTable->insert(lexeme);
+	std::string lex = *(new std::string());
+	for(int i = 0; i < (int)lexeme.size(); i++){
+		lex.push_back(std::tolower(lexeme[i]));
+	}
+	SymbolTableEntry* entry = m_symbolTable->lookup(lex);
+	if(entry == 0){
+		entry = m_symbolTable->insert(lex);
+	}
 	m_currentToken.setSymTabEntry(entry);
 }
 
 Token* Scanner::nextToken(void){
 	TokenCode tc = (TokenCode)m_lexer->yylex();
+	while(tc == tc_SPACE || tc == tc_TAB || tc == tc_NEWLINE || tc == tc_COMMENT){
+		tc = (TokenCode)m_lexer->yylex();
+	}
 	if(tc == tc_ID || tc == tc_NUMBER){
 		setCurrentToken(tc, Type, m_lexer->YYText());
 	}
