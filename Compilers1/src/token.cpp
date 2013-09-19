@@ -12,7 +12,7 @@ Token::Token(void){
 }
 
 Token::~Token(){
-	free(m_symtabEntry);
+	
 }
 
 TokenCode Token::getTokenCode() const{
