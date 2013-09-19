@@ -1,0 +1,11 @@
+PROGRAM ID(test) SEMICOL VAR ID(i) COMMA ID(j) COLON INTEGER SEMICOL ID(number) COLON REAL SEMICOL BEGIN ID(i) ASSIGNOP NUMBER(0) SEMICOL ID(j) ASSIGNOP NUMBER(1) SEMICOL IF LPAREN ID(i) RELOP(LT) ID(j) RPAREN THEN ID(number) RELOP(EQ) NUMBER(12.34) ELSE ID(number) RELOP(EQ) NUMBER(12.34e7) SEMICOL ID(i) ASSIGNOP ID(i) ADDOP(PLUS) ID(j) SEMICOL ERROR END DOT EOF 
+
+Entry              Lexeme
+    1                test
+    2                   i
+    3                   j
+    4              number
+    5                   0
+    6                   1
+    7               12.34
+    8             12.34e7
