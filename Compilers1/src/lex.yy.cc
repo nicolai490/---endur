@@ -645,7 +645,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 28 "lexer.l"
+#line 24 "lexer.l"
 
 
 #line 652 "lex.yy.cc"
@@ -743,239 +743,239 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 30 "lexer.l"
+#line 26 "lexer.l"
 {Oper = op_NONE; Type = dt_INTEGER; return tc_NUMBER;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 31 "lexer.l"
+#line 27 "lexer.l"
 {Oper = op_NONE; Type = dt_REAL; return tc_NUMBER;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 33 "lexer.l"
+#line 29 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_PROGRAM;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 34 "lexer.l"
+#line 30 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_VAR;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 35 "lexer.l"
+#line 31 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_ARRAY;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 36 "lexer.l"
+#line 32 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_OF;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 37 "lexer.l"
+#line 33 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_INTEGER;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 38 "lexer.l"
+#line 34 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_REAL;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 39 "lexer.l"
+#line 35 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_FUNCTION;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 40 "lexer.l"
+#line 36 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_PROCEDURE;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 41 "lexer.l"
+#line 37 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_BEGIN;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 42 "lexer.l"
+#line 38 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_END;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 43 "lexer.l"
+#line 39 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_IF;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 44 "lexer.l"
+#line 40 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_THEN;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 45 "lexer.l"
+#line 41 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_ELSE;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 46 "lexer.l"
+#line 42 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_WHILE;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 47 "lexer.l"
+#line 43 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_DO;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 48 "lexer.l"
+#line 44 "lexer.l"
 {Oper = op_NONE; Type = dt_KEYWORD; return tc_NOT;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 50 "lexer.l"
+#line 46 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_SPACE;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 51 "lexer.l"
+#line 47 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_TAB;}
 	YY_BREAK
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 52 "lexer.l"
+#line 48 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_NEWLINE;}
 	YY_BREAK
 case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
-#line 53 "lexer.l"
+#line 49 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_COMMENT;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 55 "lexer.l"
+#line 51 "lexer.l"
 {Oper = op_EQ; Type = dt_OP; return tc_RELOP;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 56 "lexer.l"
+#line 52 "lexer.l"
 {Oper = op_NE; Type = dt_OP; return tc_RELOP;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 57 "lexer.l"
+#line 53 "lexer.l"
 {Oper = op_LT; Type = dt_OP; return tc_RELOP;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 58 "lexer.l"
+#line 54 "lexer.l"
 {Oper = op_LE; Type = dt_OP; return tc_RELOP;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 59 "lexer.l"
+#line 55 "lexer.l"
 {Oper = op_GE; Type = dt_OP; return tc_RELOP;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 60 "lexer.l"
+#line 56 "lexer.l"
 {Oper = op_GT; Type = dt_OP; return tc_RELOP;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 62 "lexer.l"
+#line 58 "lexer.l"
 {Oper = op_PLUS; Type = dt_OP; return tc_ADDOP;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 63 "lexer.l"
+#line 59 "lexer.l"
 {Oper = op_MINUS; Type = dt_OP; return tc_ADDOP;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 64 "lexer.l"
+#line 60 "lexer.l"
 {Oper = op_OR; Type = dt_OP; return tc_ADDOP;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 66 "lexer.l"
+#line 62 "lexer.l"
 {Oper = op_MULT; Type = dt_OP; return tc_MULOP;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 67 "lexer.l"
+#line 63 "lexer.l"
 {Oper = op_DIVIDE; Type = dt_OP; return tc_MULOP;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 68 "lexer.l"
+#line 64 "lexer.l"
 {Oper = op_DIV; Type = dt_OP; return tc_MULOP;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 69 "lexer.l"
+#line 65 "lexer.l"
 {Oper = op_MOD; Type = dt_OP; return tc_MULOP;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 70 "lexer.l"
+#line 66 "lexer.l"
 {Oper = op_AND; Type = dt_OP; return tc_MULOP;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 72 "lexer.l"
+#line 68 "lexer.l"
 {Oper = op_NONE; Type = dt_OP; return tc_ASSIGNOP;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 74 "lexer.l"
+#line 70 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_SEMICOL;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 75 "lexer.l"
+#line 71 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_COLON;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 76 "lexer.l"
+#line 72 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_COMMA;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 77 "lexer.l"
+#line 73 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_DOT;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 78 "lexer.l"
+#line 74 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_DOTDOT;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 79 "lexer.l"
+#line 75 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_LPAREN;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 80 "lexer.l"
+#line 76 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_LBRACKET;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 81 "lexer.l"
+#line 77 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_RPAREN;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 82 "lexer.l"
+#line 78 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_RBRACKET;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 84 "lexer.l"
+#line 80 "lexer.l"
 {
 				std::string* s = new std::string(yytext);
 				if(s->size() < MaxLexemeSize){
@@ -988,16 +988,16 @@ YY_RULE_SETUP
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 94 "lexer.l"
+#line 90 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_ERROR;}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 95 "lexer.l"
+#line 91 "lexer.l"
 {Oper = op_NONE; Type = dt_NONE; return tc_EOF;}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 97 "lexer.l"
+#line 93 "lexer.l"
 ECHO;
 	YY_BREAK
 #line 1004 "lex.yy.cc"
@@ -1907,7 +1907,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 97 "lexer.l"
+#line 93 "lexer.l"
 
 
 

@@ -20,10 +20,6 @@ int_num             {digits}
 optional_fraction   ("."{int_num})|""
 optional_exponent   ("E"("+"|"-"|""){int_num})|""
 real_num            {int_num}{optional_fraction}{optional_exponent}
-relop               "="|"<"|"<="|">"|">="|"<>"
-addop               "+"|"-"|"or"
-mulop               "*"|"/"|"and"|"div"|"mod"
-assignop            ":="
 
 %%
 
