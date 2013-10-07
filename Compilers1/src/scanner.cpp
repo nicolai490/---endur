@@ -11,10 +11,11 @@
 Scanner::Scanner(SymbolTable* symbols, std::istream& input, std::ostream& output){
 	m_symbolTable = symbols;
 	m_lexer = new yyFlexLexer(&input, &output);
+	m_currentToken = *(new Token());
 }
 
 Scanner::~Scanner(void){
-	m_lexer->~FlexLexer();
+	delete m_lexer;
 }
 
 SymbolTable* Scanner::getSymbolTable(void){
@@ -23,7 +24,7 @@ SymbolTable* Scanner::getSymbolTable(void){
 
 void Scanner::setCurrentToken(TokenCode tc, DataType dt, OpType op){
 	//printf("Creating token %d %d %d\n", tc, dt, op);
-	m_currentToken = *(new Token());
+	//m_currentToken = *(new Token());
 	m_currentToken.setTokenCode(tc);
 	m_currentToken.setDataType(dt);
 	m_currentToken.setOpType(op);
@@ -31,18 +32,11 @@ void Scanner::setCurrentToken(TokenCode tc, DataType dt, OpType op){
 
 void Scanner::setCurrentToken(TokenCode tc, DataType dt, const std::string& lexeme){
 	//printf("Creating token %d %d 5\n", tc, dt);
-	m_currentToken = *(new Token());
+	//m_currentToken = *(new Token());
 	m_currentToken.setTokenCode(tc);
 	m_currentToken.setDataType(dt);
 	m_currentToken.setOpType(op_NONE);
-	std::string lex = *(new std::string());
-	for(int i = 0; i < (int)lexeme.size(); i++){
-		lex.push_back(std::tolower(lexeme[i]));
-	}
-	SymbolTableEntry* entry = m_symbolTable->lookup(lex);
-	if(entry == 0){
-		entry = m_symbolTable->insert(lex);
-	}
+	SymbolTableEntry* entry = m_symbolTable->insert(lexeme);
 	m_currentToken.setSymTabEntry(entry);
 }
 

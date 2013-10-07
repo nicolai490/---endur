@@ -6,10 +6,11 @@ int main(){
 	Token* token = scanner->nextToken();
 	while(token->getTokenCode() != tc_EOF){
 		std::cout << Token::toString(token) << " ";
-		token->~Token();
 		token = scanner->nextToken();
 	}
 	std::cout << Token::toString(token) << " ";
 	std::cout << "\n\n";
 	SymbolTable::print(symbolTable);
+	delete symbolTable;
+	delete scanner;
 }

@@ -13,15 +13,21 @@ SymbolTable::SymbolTable(void){
 
 SymbolTable::~SymbolTable(void){
 	for(int i = 0; i < (int)m_table.size(); i++){
-		free(m_table[i]);
+		delete m_table[i];
 	}
-	m_table.~EntryList();
 }
 
 SymbolTableEntry* SymbolTable::insert(const std::string lexeme){
-	SymbolTableEntry* entry = new SymbolTableEntry();
-	entry->lexeme = lexeme;
-	m_table.push_back(entry);
+	std::string lex = *(new std::string());
+	for(int i = 0; i < (int)lexeme.size(); i++){
+		lex.push_back(std::tolower(lexeme[i]));
+	}
+	SymbolTableEntry* entry = lookup(lex);
+	if(entry == 0){
+		entry = new SymbolTableEntry();
+		entry->lexeme = lex;
+		m_table.push_back(entry);
+	}
 	return entry;
 }
 
