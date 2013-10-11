@@ -978,7 +978,7 @@ YY_RULE_SETUP
 #line 80 "lexer.l"
 {
 				std::string* s = new std::string(yytext);
-				if(s->size() < MaxLexemeSize){
+				if(s->size() <= MaxLexemeSize){
 					Oper = op_NONE; Type = dt_ID; return tc_ID;
 				}
 				else{

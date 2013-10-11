@@ -79,7 +79,7 @@ real_num            {int_num}{optional_fraction}{optional_exponent}
 
 {id}		{
 				std::string* s = new std::string(yytext);
-				if(s->size() < MaxLexemeSize){
+				if(s->size() <= MaxLexemeSize){
 					Oper = op_NONE; Type = dt_ID; return tc_ID;
 				}
 				else{

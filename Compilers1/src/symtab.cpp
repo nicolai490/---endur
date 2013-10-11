@@ -23,7 +23,7 @@ SymbolTableEntry* SymbolTable::insert(const std::string lexeme){
 		lex.push_back(std::tolower(lexeme[i]));
 	}
 	SymbolTableEntry* entry = lookup(lex);
-	if(entry == 0){
+	if(entry == NULL){
 		entry = new SymbolTableEntry();
 		entry->lexeme = lex;
 		m_table.push_back(entry);
@@ -37,5 +37,5 @@ SymbolTableEntry* SymbolTable::lookup(const std::string& lexeme){
 			return m_table[i];
 		}
 	}
-	return 0;
+	return NULL;
 }
