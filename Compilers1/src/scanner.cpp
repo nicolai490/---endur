@@ -12,6 +12,7 @@ Scanner::Scanner(SymbolTable* symbols, std::istream& input, std::ostream& output
 	m_symbolTable = symbols;
 	m_lexer = new yyFlexLexer(&input, &output);
 	m_currentToken = *(new Token());
+	m_sourceLine = *(new SourceLine());
 }
 
 Scanner::~Scanner(void){
@@ -43,6 +44,12 @@ void Scanner::setCurrentToken(TokenCode tc, DataType dt, const std::string& lexe
 Token* Scanner::nextToken(void){
 	TokenCode tc = (TokenCode)m_lexer->yylex();
 	while(tc == tc_SPACE || tc == tc_TAB || tc == tc_NEWLINE || tc == tc_COMMENT){
+		if(tc == tc_NEWLINE){
+			flushSourceLine();
+		}
+		else{
+			m_sourceLine.buildLine(m_lexer->YYText());
+		}
 		tc = (TokenCode)m_lexer->yylex();
 	}
 	if(tc == tc_ID || tc == tc_NUMBER){
@@ -51,5 +58,17 @@ Token* Scanner::nextToken(void){
 	else{
 		setCurrentToken(tc, Type, Oper);
 	}
+	m_sourceLine.buildLine(m_lexer->YYText());
 	return &m_currentToken;
+}
+
+void Scanner::flushSourceLine(){
+	if(m_sourceLine.hasError()){
+		m_sourceLine.printLine();
+	}
+	m_sourceLine.newLine();
+}
+
+void Scanner::addError(std::string error){
+	m_sourceLine.addError(error);
 }

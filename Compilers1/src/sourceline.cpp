@@ -5,6 +5,7 @@
  *      Author: ubuntu
  */
 
+#include <iostream>
 #include "sourceline.h"
 
 int LineError::getColumn(){
@@ -35,6 +36,7 @@ void SourceLine::buildLine(const std::string& str){
 }
 
 void SourceLine::addError(const std::string& msg){
+	if(m_errors.size() >= MAX_ERRORS_IN_LINE) return;
 	LineError error = *(new LineError());
 	error.set(m_firstLexemeColumn, msg);
 	m_errors.push_back(error);
@@ -46,7 +48,7 @@ bool SourceLine::hasError(){
 
 void SourceLine::printLine(){
 	std::cout << m_lineNo << " : " << m_line << "\n";
-	for(int i = 0; i < m_errors.size(); i++){
+	for(int i = 0; i < (int)m_errors.size(); i++){
 		LineError error = m_errors[i];
 		
 		//Length of the line number:
