@@ -13,7 +13,7 @@
 #include "token.h"
 
 /* Parser includes, uncomment in part 2 */
-//#include "sourceline.h"
+#include "sourceline.h"
 
 // Forward declaration of the FlexLexer class
 // -> have #include "lex.yy.cc" in scanner.cpp
@@ -42,11 +42,11 @@ public:
 	Token* nextToken(void);					// returns the next token from FlexLexer	
 
 /* Parser, implement in part 2, uncomment then */
-/*private:
+private:
  SourceLine m_sourceLine;
  void flushSourceLine();					// print the current line and the errors found
 public:
-	void addError(std::string error);*/
+	void addError(std::string error);
 };
 
 #endif
