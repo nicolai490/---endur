@@ -5,19 +5,25 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/main.cpp \
+../src/parser.cpp \
 ../src/scanner.cpp \
+../src/sourceline.cpp \
 ../src/symtab.cpp \
 ../src/token.cpp 
 
 OBJS += \
 ./src/main.o \
+./src/parser.o \
 ./src/scanner.o \
+./src/sourceline.o \
 ./src/symtab.o \
 ./src/token.o 
 
 CPP_DEPS += \
 ./src/main.d \
+./src/parser.d \
 ./src/scanner.d \
+./src/sourceline.d \
 ./src/symtab.d \
 ./src/token.d 
 

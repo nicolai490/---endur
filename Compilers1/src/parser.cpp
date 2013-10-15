@@ -16,9 +16,8 @@ Parser::Parser(std::istream& input, std::ostream& output){
 }
 
 Parser::~Parser(){
-	delete m_currentToken;
-	delete m_lexan;
 	delete m_symbolTable;
+	delete m_lexan;
 }
 
 void Parser::parse(){
@@ -50,16 +49,18 @@ void Parser::match(TokenCode tc){
 		getToken();
 	}
 	else{
-		printf("Error.\n");
+		expectedTokenCode(tc);
+		getToken();
 	}
 }
 
 void Parser::setError(const std::string& err){
-	
+	m_totalErrors++;
+	m_lexan->addError(err);
 }
 
 void Parser::expectedTokenCode(TokenCode tc){
-	
+	setError("Expected " + tokenCodeStrings[tc] + ".");
 }
 
 TokenCode Parser::getTokenCode(){
@@ -94,12 +95,14 @@ void Parser::parseIdentifierListPrime(EntryList& idList){
 }
 
 void Parser::parseDeclarations(){
-	match(tc_VAR);
-	parseIdentifierList(*(new EntryList()));
-	match(tc_COLON);
-	parseType();
-	match(tc_SEMICOL);
-	parseDeclarations();
+	if(isNext(tc_VAR)){
+		match(tc_VAR);
+		parseIdentifierList(*(new EntryList()));
+		match(tc_COLON);
+		parseType();
+		match(tc_SEMICOL);
+		parseDeclarations();
+	}
 }
 
 void Parser::parseType(){
@@ -126,14 +129,16 @@ void Parser::parseStandardType(){
 		match(tc_REAL);
 	}
 	else{
-		printf("Error.\n");
+		setError("Expected a type.");
 	}
 }
 
 void Parser::parseSubprogramDeclarations(){
-	parseSubprogramDeclaration();
-	match(tc_SEMICOL);
-	parseSubprogramDeclarations();
+	if(isNext(tc_FUNCTION) || isNext(tc_PROCEDURE)){
+		parseSubprogramDeclaration();
+		match(tc_SEMICOL);
+		parseSubprogramDeclarations();
+	}
 }
 
 void Parser::parseSubprogramDeclaration(){
@@ -158,7 +163,7 @@ void Parser::parseSubprogramHead(){
 		match(tc_SEMICOL);
 	}
 	else{
-		printf("Error.\n");
+		setError("Expected a subprogram declaration.");
 	}
 }
 
@@ -236,7 +241,7 @@ void Parser::parseStatement(){
 		parseStatement();
 	}
 	else{
-		printf("Error.\n");
+		setError("Expected a statement.");
 	}
 }
 
@@ -361,7 +366,7 @@ SymbolTableEntry* Parser::parseFactor(){
 		parseFactor();
 	}
 	else{
-		printf("Error.\n");
+		setError("Expected a factor.");
 	}
 	return entry;
 }
@@ -375,15 +380,12 @@ SymbolTableEntry* Parser::parseFactorPrime(SymbolTableEntry* prevEntry){
 		parseExpressionList(prevEntry);
 		match(tc_RPAREN);
 	}
-	else{
-		printf("Error.\n");
-	}
 	return prevEntry;
 }
 
 void Parser::parseSign(){
 	if(!(m_currentToken->getOpType() == op_PLUS || m_currentToken->getOpType() == op_MINUS)){
-		printf("Error.\n");
+		setError("Expected a sign.");
 	}
 	match(tc_ADDOP);
 }

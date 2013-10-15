@@ -43,14 +43,22 @@ void Scanner::setCurrentToken(TokenCode tc, DataType dt, const std::string& lexe
 
 Token* Scanner::nextToken(void){
 	TokenCode tc = (TokenCode)m_lexer->yylex();
-	while(tc == tc_SPACE || tc == tc_TAB || tc == tc_NEWLINE || tc == tc_COMMENT){
+	//std::cout << "Read " << tokenCodeStrings[tc] << ".\n";
+	while(tc == tc_SPACE || tc == tc_TAB || tc == tc_NEWLINE || tc == tc_COMMENT || tc == tc_ERROR || tc == tc_ERROR2){
 		if(tc == tc_NEWLINE){
 			flushSourceLine();
 		}
 		else{
 			m_sourceLine.buildLine(m_lexer->YYText());
 		}
+		if(tc == tc_ERROR){
+			addError("Invalid character.");
+		}
+		else if(tc == tc_ERROR2){
+			addError("Identifier too long.");
+		}
 		tc = (TokenCode)m_lexer->yylex();
+		//std::cout << "Read " << tokenCodeStrings[tc] << ".\n";
 	}
 	if(tc == tc_ID || tc == tc_NUMBER){
 		setCurrentToken(tc, Type, m_lexer->YYText());

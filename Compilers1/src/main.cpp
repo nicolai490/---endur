@@ -1,16 +1,14 @@
-#include "scanner.h"
+#include "parser.h"
 
 int main(){
-	SymbolTable* symbolTable = new SymbolTable();
-	Scanner* scanner = new Scanner(symbolTable, std::cin, std::cout);
-	Token* token = scanner->nextToken();
-	while(token->getTokenCode() != tc_EOF){
-		std::cout << Token::toString(token) << " ";
-		token = scanner->nextToken();
+	Parser* parser = new Parser(std::cin, std::cout);
+	parser->parse();
+	if(parser->totalErrors() == 0){
+		std::cout << "No errors.\n";
 	}
-	std::cout << Token::toString(token) << " ";
-	std::cout << "\n\n";
-	SymbolTable::print(symbolTable);
-	delete symbolTable;
-	delete scanner;
+	else{
+		std::cout << "Number of errors: " << parser->totalErrors() << ".\n";
+	}
+	delete parser;
+	return 0;
 }
