@@ -58,7 +58,7 @@ void SourceLine::printLine(){
 			num /= 10;
 		}
 		
-		std::cout << "   ";
+		std::cout << "  ";
 		
 		num = error.getColumn();
 		while(num > 0){

@@ -246,10 +246,12 @@ void Parser::parseStatement(){
 }
 
 void Parser::parseStatementPrime(SymbolTableEntry* prevEntry){
-	if(isNext(tc_LBRACKET)){
+	if(isNext(tc_LBRACKET) || isNext(tc_ASSIGNOP)){
 		parseVariablePrime(prevEntry);
+		match(tc_ASSIGNOP);
+		parseExpression();
 	}
-	else if(isNext(tc_LPAREN)){
+	else{
 		parseProcedureStatementPrime(prevEntry);
 	}
 }
@@ -298,9 +300,11 @@ void Parser::parseExpressionList(SymbolTableEntry* prevEntry){
 }
 
 void Parser::parseExpressionListPrime(EntryList& expList){
-	match(tc_COMMA);
-	expList.push_back(parseExpression());
-	parseExpressionListPrime(expList);
+	if(isNext(tc_COMMA)){
+		match(tc_COMMA);
+		expList.push_back(parseExpression());
+		parseExpressionListPrime(expList);
+	}
 }
 
 SymbolTableEntry* Parser::parseExpression(){
@@ -327,9 +331,11 @@ SymbolTableEntry* Parser::parseSimpleExpression(){
 }
 
 SymbolTableEntry* Parser::parseSimpleExpressionPrime(SymbolTableEntry* prevEntry){
-	match(tc_ADDOP);
-	parseTerm();
-	prevEntry = parseSimpleExpressionPrime(prevEntry);
+	if(isNext(tc_ADDOP)){
+		match(tc_ADDOP);
+		parseTerm();
+		prevEntry = parseSimpleExpressionPrime(prevEntry);
+	}
 	return prevEntry;
 }
 
@@ -340,9 +346,11 @@ SymbolTableEntry* Parser::parseTerm(){
 }
 
 SymbolTableEntry* Parser::parseTermPrime(SymbolTableEntry* prevEntry){
-	match(tc_MULOP);
-	parseFactor();
-	prevEntry = parseTermPrime(prevEntry);
+	if(isNext(tc_MULOP)){
+		match(tc_MULOP);
+		parseFactor();
+		prevEntry = parseTermPrime(prevEntry);
+	}
 	return prevEntry;
 }
 
