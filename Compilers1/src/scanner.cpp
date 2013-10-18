@@ -45,7 +45,7 @@ void Scanner::setCurrentToken(TokenCode tc, DataType dt, const std::string& lexe
 Token* Scanner::nextToken(void){
 	TokenCode tc = (TokenCode)m_lexer->yylex();
 	//std::cout << "Read " << tokenCodeStrings[tc] << ".\n";
-	while(tc == tc_SPACE || tc == tc_TAB || tc == tc_NEWLINE || tc == tc_COMMENT || tc == tc_ERROR || tc == tc_ERROR2){
+	while(tc == tc_SPACE || tc == tc_TAB || tc == tc_NEWLINE || tc == tc_COMMENT){
 		if(tc == tc_NEWLINE){
 			flushSourceLine();
 		}
@@ -54,12 +54,6 @@ Token* Scanner::nextToken(void){
 		}
 		else{
 			m_sourceLine.buildLine(m_lexer->YYText());
-		}
-		if(tc == tc_ERROR){
-			addError("Invalid character.");
-		}
-		else if(tc == tc_ERROR2){
-			addError("Identifier too long.");
 		}
 		tc = (TokenCode)m_lexer->yylex();
 		//std::cout << "Read " << tokenCodeStrings[tc] << ".\n";

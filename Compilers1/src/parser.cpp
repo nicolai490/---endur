@@ -11,8 +11,8 @@
 Parser::Parser(std::istream& input, std::ostream& output){
 	m_symbolTable = new SymbolTable();
 	m_lexan = new Scanner(m_symbolTable, input, output);
-	getToken();
 	m_totalErrors = 0;
+	getToken();
 }
 
 Parser::~Parser(){
@@ -54,6 +54,15 @@ void Parser::recover(const TokenCode list[]){
 
 void Parser::getToken(){
 	m_currentToken = m_lexan->nextToken();
+	while(m_currentToken->getTokenCode() == tc_ERROR || m_currentToken->getTokenCode() == tc_ERROR2){
+		if(m_currentToken->getTokenCode() == tc_ERROR){
+			setError("Invalid Character.");
+		}
+		else{
+			setError("Identifier too long.");
+		}
+		m_currentToken = m_lexan->nextToken();
+	}
 }
 
 void Parser::match(TokenCode tc){
