@@ -16,6 +16,7 @@ Scanner::Scanner(SymbolTable* symbols, std::istream& input, std::ostream& output
 }
 
 Scanner::~Scanner(void){
+	flushSourceLine();
 	delete m_lexer;
 }
 
@@ -47,6 +48,9 @@ Token* Scanner::nextToken(void){
 	while(tc == tc_SPACE || tc == tc_TAB || tc == tc_NEWLINE || tc == tc_COMMENT || tc == tc_ERROR || tc == tc_ERROR2){
 		if(tc == tc_NEWLINE){
 			flushSourceLine();
+		}
+		else if(tc == tc_TAB){
+			m_sourceLine.buildLine("    ");
 		}
 		else{
 			m_sourceLine.buildLine(m_lexer->YYText());

@@ -103,7 +103,7 @@ void Parser::parseProgram(){
 void Parser::parseIdentifierList(EntryList& idList){
 	const TokenCode synch[] = {tc_ID, tc_COLON, tc_NONE};
 	if(! isNext(tc_ID)){
-		setError("Expected an identifier.");
+		setError("Expected an identifier list.");
 		recover(synch);
 		if(isNext(tc_COLON)){
 			return;
@@ -117,7 +117,7 @@ void Parser::parseIdentifierListPrime(EntryList& idList){
 	if(isNext(tc_COMMA)){
 		match(tc_COMMA);
 		match(tc_ID);
-		parseIdentifierList(idList);
+		parseIdentifierListPrime(idList);
 	}
 }
 
@@ -254,7 +254,7 @@ void Parser::parseParameterListPrime(){
 }
 
 void Parser::parseCompoundStatement(){
-	const TokenCode first[] = {tc_BEGIN, tc_DOT, tc_SEMICOL, tc_ELSE, tc_NONE};
+	const TokenCode synch[] = {tc_BEGIN, tc_DOT, tc_SEMICOL, tc_ELSE, tc_NONE};
 	if(! isNext(tc_BEGIN)){
 		setError("Expected a compound statement.");
 		recover(synch);
@@ -295,11 +295,11 @@ void Parser::parseStatementListPrime(){
 }
 
 void Parser::parseStatement(){
-	const TokenCode synch[] = {tc_BEGIN, tc_IF,tc_WHILE, tc_ID, tc_SEMICOL, tc_ELSE, tc_NONE};
-	if(! (isNext(tc_BEGIN) || isNext(tc_IF) || isNext(tc_ID))){
+	const TokenCode synch[] = {tc_BEGIN, tc_IF,tc_WHILE, tc_ID, tc_SEMICOL, tc_ELSE, tc_END, tc_NONE};
+	if(! (isNext(tc_BEGIN) || isNext(tc_IF) || isNext(tc_ID) || isNext(tc_WHILE))){
 		setError("Expected a statement.");
 		recover(synch);
-		if(isNext(tc_SEMICOL) || isNext(tc_ELSE)){
+		if(isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_END)){
 			return;
 		}
 	}
@@ -339,11 +339,11 @@ void Parser::parseStatementPrime(SymbolTableEntry* prevEntry){
 }
 
 SymbolTableEntry* Parser::parseVariable(){
-	const TokenCode synch[] = {tc_ID, tc_ASSIGNOP, tc_MULOP, tc_ADDOP, tc_RELOP, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_SEMICOL, tc_ELSE, tc_NONE};
+	const TokenCode synch[] = {tc_ID, tc_ASSIGNOP, tc_MULOP, tc_ADDOP, tc_RELOP, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_SEMICOL, tc_ELSE, tc_END, tc_NONE};
 	if(! isNext(tc_ID)){
 		setError("Expected a variable.");
 		recover(synch);
-		if(isNext(tc_ASSIGNOP) || isNext(tc_MULOP) || isNext(tc_ADDOP) || isNext(tc_RELOP) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_SEMICOL) || isNext(tc_ELSE)){
+		if(isNext(tc_ASSIGNOP) || isNext(tc_MULOP) || isNext(tc_ADDOP) || isNext(tc_RELOP) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_END)){
 			return NULL;
 		}
 	}
@@ -366,11 +366,11 @@ SymbolTableEntry* Parser::parseVariablePrime(SymbolTableEntry* prevEntry){
 }
 
 void Parser::parseProcedureStatement(){
-	const TokenCode synch[] = {tc_ID, tc_SEMICOL, tc_ELSE, tc_NONE};
+	const TokenCode synch[] = {tc_ID, tc_SEMICOL, tc_ELSE, tc_END, tc_NONE};
 	if(! isNext(tc_ID)){
 		setError("Expected a procedure statement.");
 		recover(synch);
-		if(isNext(tc_SEMICOL) || isNext(tc_ELSE)){
+		if(isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_END)){
 			return;
 		}
 	}
@@ -414,11 +414,11 @@ void Parser::parseExpressionListPrime(EntryList& expList){
 }
 
 SymbolTableEntry* Parser::parseExpression(){
-	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_SEMICOL, tc_ELSE, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_NONE};
+	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_SEMICOL, tc_ELSE, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_END, tc_NONE};
 	if(! (isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_LPAREN) || isNext(tc_NOT) || isNext(tc_ADDOP))){
 		setError("Expected an expression.");
 		recover(synch);
-		if(isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN)){
+		if(isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_END)){
 			return NULL;
 		}
 	}
@@ -436,11 +436,11 @@ SymbolTableEntry* Parser::parseExpressionPrime(SymbolTableEntry* prevEntry){
 }
 
 SymbolTableEntry* Parser::parseSimpleExpression(){
-	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_SEMICOL, tc_ELSE, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_RELOP, tc_NONE};
+	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_SEMICOL, tc_ELSE, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_RELOP, tc_END, tc_NONE};
 		if(! (isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_LPAREN) || isNext(tc_NOT) || isNext(tc_ADDOP))){
 			setError("Expected a simple expression.");
 			recover(synch);
-			if(isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_RELOP)){
+			if(isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_RELOP) || isNext(tc_END)){
 				return NULL;
 			}
 		}
@@ -462,11 +462,11 @@ SymbolTableEntry* Parser::parseSimpleExpressionPrime(SymbolTableEntry* prevEntry
 }
 
 SymbolTableEntry* Parser::parseTerm(){
-	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_RELOP, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_SEMICOL, tc_ELSE, tc_NONE};
+	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_RELOP, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_SEMICOL, tc_ELSE, tc_END, tc_NONE};
 	if(! (isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_LPAREN) || isNext(tc_NOT))){
 		setError("Expected a term.");
 		recover(synch);
-		if(isNext(tc_ADDOP) || isNext(tc_RELOP) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_SEMICOL) || isNext(tc_ELSE)){
+		if(isNext(tc_ADDOP) || isNext(tc_RELOP) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_END)){
 			return NULL;
 		}
 	}
@@ -485,11 +485,11 @@ SymbolTableEntry* Parser::parseTermPrime(SymbolTableEntry* prevEntry){
 }
 
 SymbolTableEntry* Parser::parseFactor(){
-	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_MULOP, tc_ADDOP, tc_RELOP, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_SEMICOL, tc_ELSE, tc_NONE};
+	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_MULOP, tc_ADDOP, tc_RELOP, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_SEMICOL, tc_ELSE, tc_END, tc_NONE};
 	if(! (isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_LPAREN) || isNext(tc_NOT))){
 		setError("Expected a factor.");
 		recover(synch);
-		if(isNext(tc_ADDOP) || isNext(tc_RELOP) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_MULOP)){
+		if(isNext(tc_ADDOP) || isNext(tc_RELOP) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_MULOP) || isNext(tc_END)){
 			return NULL;
 		}
 	}
