@@ -1,31 +1,28 @@
 4 : Var y : real;
-    ^ Inserted SEMICOL.
+    ^ Expected SEMICOL.
 7 : var t : array[1..10 of real;
-                        ^ Inserted RBRACKET.
+                        ^ Expected RBRACKET.
 8 : var i  integer;
-           ^ Inserted COLON.
+           ^ Expected COLON.
 12 :         while (i < 4 do
-                          ^ Inserted RPAREN.
+                          ^ Expected RPAREN.
 14 :         ftest := t[1;
-                         ^ Inserted RBRACKET.
-15 : end;
-     ^ Expected a statement.
+                         ^ Expected RBRACKET.
 17 : procedure ptest(z w real);
-                       ^ Inserted COLON.
-                       ^ Expected a type.
+                       ^ Expected COLON.
 18 : var r real;
-           ^ Inserted COLON.
+           ^ Expected COLON.
 25 :     y := 2.0*(3.14!$);
                        ^ Invalid Character.
                         ^ Invalid Character.
 27 :     begin
-         ^ Inserted THEN.
+         ^ Expected THEN.
 38 :     begin
-         ^ Inserted DO.
+         ^ Expected DO.
 39 :        y := ftest (x;
-                         ^ Inserted RPAREN.
+                         ^ Expected RPAREN.
 41 :     end
-         ^ Expected a term.
+         ^ Expected NUMBER.
 42 : .
-     ^ Inserted END.
-Number of errors: 16.
+     ^ Expected END.
+Number of errors: 14.

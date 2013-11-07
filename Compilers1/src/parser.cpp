@@ -12,6 +12,7 @@ Parser::Parser(std::istream& input, std::ostream& output){
 	m_symbolTable = new SymbolTable();
 	m_lexan = new Scanner(m_symbolTable, input, output);
 	m_totalErrors = 0;
+	m_parserError = false;
 	getToken();
 }
 
@@ -50,6 +51,7 @@ void Parser::recover(const TokenCode list[]){
 		if(m_currentToken->getTokenCode() == tc_EOF) return;
 		getToken();
 	}
+	m_parserError = false;
 }
 
 void Parser::getToken(){
@@ -62,6 +64,7 @@ void Parser::getToken(){
 			setError("Identifier too long.");
 		}
 		m_currentToken = m_lexan->nextToken();
+		m_parserError = false;
 	}
 }
 
@@ -77,10 +80,11 @@ void Parser::match(TokenCode tc){
 void Parser::setError(const std::string& err){
 	m_totalErrors++;
 	m_lexan->addError(err);
+	m_parserError = true;
 }
 
 void Parser::expectedTokenCode(TokenCode tc){
-	setError("Inserted " + tokenCodeStrings[tc] + ".");
+	setError("Expected " + tokenCodeStrings[tc] + ".");
 }
 
 TokenCode Parser::getTokenCode(){
@@ -92,33 +96,52 @@ bool Parser::isNext(TokenCode tc){
 }
 
 void Parser::parseProgram(){
-	const TokenCode synch[] = {tc_PROGRAM, tc_EOF, tc_NONE};
-	if(! isNext(tc_PROGRAM)){
-		setError("Expected a program.");
+	match(tc_PROGRAM);
+	if(m_parserError){
+		TokenCode synch[] = {tc_PROGRAM, tc_ID, tc_NONE};
 		recover(synch);
-		if(isNext(tc_EOF)){
-			return;
+		if(isNext(tc_PROGRAM)){
+			match(tc_PROGRAM);
 		}
 	}
-	match(tc_PROGRAM);
 	match(tc_ID);
+	if(m_parserError){
+		TokenCode synch[] = {tc_ID, tc_SEMICOL, tc_NONE};
+		recover(synch);
+		if(isNext(tc_ID)){
+			match(tc_ID);
+		}
+	}
 	match(tc_SEMICOL);
+	if(m_parserError){
+		TokenCode synch[] = {tc_SEMICOL, tc_VAR, tc_FUNCTION, tc_PROCEDURE, tc_BEGIN, tc_NONE};
+		recover(synch);
+		if(isNext(tc_SEMICOL)){
+			match(tc_SEMICOL);
+		}
+	}
 	parseDeclarations();
 	parseSubprogramDeclarations();
 	parseCompoundStatement();
 	match(tc_DOT);
+	if(m_parserError){
+		TokenCode synch[] = {tc_DOT, tc_EOF, tc_NONE};
+		recover(synch);
+		if(isNext(tc_DOT)){
+			match(tc_DOT);
+		}
+	}
 }
 
 void Parser::parseIdentifierList(EntryList& idList){
-	const TokenCode synch[] = {tc_ID, tc_COLON, tc_NONE};
-	if(! isNext(tc_ID)){
-		setError("Expected an identifier list.");
+	match(tc_ID);
+	if(m_parserError){
+		TokenCode synch[] = {tc_COMMA, tc_COLON, tc_ID, tc_NONE};
 		recover(synch);
-		if(isNext(tc_COLON)){
-			return;
+		if(isNext(tc_ID)){
+			match(tc_ID);
 		}
 	}
-	match(tc_ID);
 	parseIdentifierListPrime(idList);
 }
 
@@ -126,6 +149,13 @@ void Parser::parseIdentifierListPrime(EntryList& idList){
 	if(isNext(tc_COMMA)){
 		match(tc_COMMA);
 		match(tc_ID);
+		if(m_parserError){
+			TokenCode synch[] = {tc_COMMA, tc_COLON, tc_ID, tc_NONE};
+			recover(synch);
+			if(isNext(tc_ID)){
+				match(tc_ID);
+			}
+		}
 		parseIdentifierListPrime(idList);
 	}
 }
@@ -135,29 +165,84 @@ void Parser::parseDeclarations(){
 		match(tc_VAR);
 		parseIdentifierList(*(new EntryList()));
 		match(tc_COLON);
+		if(m_parserError){
+			TokenCode synch[] = {tc_COLON, tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
+			recover(synch);
+			if(isNext(tc_COLON)){
+				match(tc_COLON);
+			}
+		}
 		parseType();
 		match(tc_SEMICOL);
+		if(m_parserError){
+			TokenCode synch[] = {tc_VAR, tc_FUNCTION, tc_BEGIN, tc_PROCEDURE, tc_SEMICOL, tc_NONE};
+			recover(synch);
+			if(isNext(tc_SEMICOL)){
+				match(tc_SEMICOL);
+			}
+		}
 		parseDeclarations();
 	}
 }
 
 void Parser::parseType(){
-	const TokenCode synch[] = {tc_ARRAY, tc_INTEGER, tc_REAL, tc_SEMICOL, tc_NONE};
-	if(! (isNext(tc_ARRAY) || isNext(tc_INTEGER) || isNext(tc_REAL))){
-		setError("Expected a type.");
-		recover(synch);
-		if(isNext(tc_SEMICOL)){
-			return;
-		}
-	}
 	if(isNext(tc_ARRAY)){
 		match(tc_ARRAY);
+		if(m_parserError){
+			TokenCode synch[] = {tc_ARRAY, tc_LBRACKET, tc_NONE};
+			recover(synch);
+			if(isNext(tc_ARRAY)){
+				match(tc_ARRAY);
+			}
+		}
 		match(tc_LBRACKET);
+		if(m_parserError){
+			TokenCode synch[] = {tc_LBRACKET, tc_NUMBER, tc_NONE};
+			recover(synch);
+			if(isNext(tc_LBRACKET)){
+				match(tc_LBRACKET);
+			}
+		}
 		match(tc_NUMBER);
+		if(m_parserError){
+			TokenCode synch[] = {tc_NUMBER, tc_DOTDOT, tc_NONE};
+			recover(synch);
+			if(isNext(tc_NUMBER)){
+				match(tc_NUMBER);
+			}
+		}
 		match(tc_DOTDOT);
+		if(m_parserError){
+			TokenCode synch[] = {tc_NUMBER, tc_DOTDOT, tc_NONE};
+			recover(synch);
+			if(isNext(tc_DOTDOT)){
+				match(tc_DOTDOT);
+			}
+		}
 		match(tc_NUMBER);
+		if(m_parserError){
+			TokenCode synch[] = {tc_NUMBER, tc_RBRACKET, tc_NONE};
+			recover(synch);
+			if(isNext(tc_NUMBER)){
+				match(tc_NUMBER);
+			}
+		}
 		match(tc_RBRACKET);
+		if(m_parserError){
+			TokenCode synch[] = {tc_RBRACKET, tc_OF, tc_NONE};
+			recover(synch);
+			if(isNext(tc_RBRACKET)){
+				match(tc_RBRACKET);
+			}
+		}
 		match(tc_OF);
+		if(m_parserError){
+			TokenCode synch[] = {tc_OF, tc_INTEGER, tc_REAL, tc_NONE};
+			recover(synch);
+			if(isNext(tc_OF)){
+				match(tc_OF);
+			}
+		}
 		parseStandardType();
 	}
 	else{
@@ -166,19 +251,18 @@ void Parser::parseType(){
 }
 
 void Parser::parseStandardType(){
-	const TokenCode synch[] = {tc_INTEGER, tc_REAL, tc_SEMICOL, tc_NONE};
-	if(! (isNext(tc_INTEGER) || isNext(tc_REAL))){
-		setError("Expected a standard type.");
-		recover(synch);
-		if(isNext(tc_SEMICOL)){
-			return;
-		}
-	}
 	if(isNext(tc_INTEGER)){
 		match(tc_INTEGER);
 	}
-	else if(isNext(tc_REAL)){
+	else{
 		match(tc_REAL);
+		if(m_parserError){
+			TokenCode synch[] = {tc_REAL, tc_SEMICOL, tc_NONE};
+			recover(synch);
+			if(isNext(tc_REAL)){
+				match(tc_REAL);
+			}
+		}
 	}
 }
 
@@ -186,46 +270,79 @@ void Parser::parseSubprogramDeclarations(){
 	if(isNext(tc_FUNCTION) || isNext(tc_PROCEDURE)){
 		parseSubprogramDeclaration();
 		match(tc_SEMICOL);
+		if(m_parserError){
+			TokenCode synch[] = {tc_SEMICOL, tc_FUNCTION, tc_PROCEDURE, tc_BEGIN, tc_NONE};
+			recover(synch);
+			if(isNext(tc_SEMICOL)){
+				match(tc_SEMICOL);
+			}
+		}
 		parseSubprogramDeclarations();
 	}
 }
 
 void Parser::parseSubprogramDeclaration(){
-	const TokenCode synch[] = {tc_FUNCTION, tc_PROCEDURE, tc_SEMICOL, tc_NONE};
-	if(! (isNext(tc_FUNCTION) || isNext(tc_PROCEDURE))){
-		setError("Expected a subprogram declaration.");
-		recover(synch);
-		if(isNext(tc_SEMICOL)){
-			return;
-		}
-	}
 	parseSubprogramHead();
 	parseDeclarations();
 	parseCompoundStatement();
 }
 
 void Parser::parseSubprogramHead(){
-	const TokenCode synch[] = {tc_FUNCTION, tc_PROCEDURE, tc_VAR, tc_BEGIN, tc_NONE};
-	if(! (isNext(tc_FUNCTION) || isNext(tc_PROCEDURE))){
-		setError("Expected a subprogram head.");
-		recover(synch);
-		if(isNext(tc_VAR) || isNext(tc_BEGIN)){
-			return;
-		}
-	}
 	if(isNext(tc_FUNCTION)){
 		match(tc_FUNCTION);
 		match(tc_ID);
+		if(m_parserError){
+			TokenCode synch[] = {tc_LPAREN, tc_COLON, tc_ID, tc_NONE};
+			recover(synch);
+			if(isNext(tc_ID)){
+				match(tc_ID);
+			}
+		}
 		parseArguments();
 		match(tc_COLON);
+		if(m_parserError){
+			TokenCode synch[] = {tc_COLON, tc_INTEGER, tc_REAL, tc_NONE};
+			recover(synch);
+			if(isNext(tc_COLON)){
+				match(tc_COLON);
+			}
+		}
 		parseStandardType();
 		match(tc_SEMICOL);
+		if(m_parserError){
+			TokenCode synch[] = {tc_SEMICOL, tc_VAR, tc_BEGIN, tc_NONE};
+			recover(synch);
+			if(isNext(tc_SEMICOL)){
+				match(tc_SEMICOL);
+			}
+		}
 	}
-	else if(isNext(tc_PROCEDURE)){
+	else{
 		match(tc_PROCEDURE);
+		if(m_parserError){
+			TokenCode synch[] = {tc_PROCEDURE, tc_ID, tc_NONE};
+			recover(synch);
+			if(isNext(tc_PROCEDURE)){
+				match(tc_PROCEDURE);
+			}
+		}
 		match(tc_ID);
+		if(m_parserError){
+			TokenCode synch[] = {tc_LPAREN, tc_SEMICOL, tc_ID, tc_NONE};
+			recover(synch);
+			if(isNext(tc_ID)){
+				match(tc_ID);
+			}
+		}
 		parseArguments();
 		match(tc_SEMICOL);
+		if(m_parserError){
+			TokenCode synch[] = {tc_SEMICOL, tc_VAR, tc_BEGIN, tc_NONE};
+			recover(synch);
+			if(isNext(tc_SEMICOL)){
+				match(tc_SEMICOL);
+			}
+		}
 	}
 }
 
@@ -234,20 +351,26 @@ void Parser::parseArguments(){
 		match(tc_LPAREN);
 		parseParameterList();
 		match(tc_RPAREN);
+		if(m_parserError){
+			TokenCode synch[] = {tc_RPAREN, tc_COLON, tc_SEMICOL, tc_NONE};
+			recover(synch);
+			if(isNext(tc_RPAREN)){
+				match(tc_RPAREN);
+			}
+		}
 	}
 }
 
 void Parser::parseParameterList(){
-	const TokenCode synch[] = {tc_ID, tc_RPAREN, tc_NONE};
-	if(! isNext(tc_ID)){
-		setError("Expected a parameter list.");
-		recover(synch);
-		if(isNext(tc_RPAREN)){
-			return;
-		}
-	}
 	parseIdentifierList(*(new EntryList()));
 	match(tc_COLON);
+	if(m_parserError){
+		TokenCode synch[] = {tc_COLON, tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
+		recover(synch);
+		if(isNext(tc_COLON)){
+			match(tc_COLON);
+		}
+	}
 	parseType();
 	parseParameterListPrime();
 }
@@ -257,23 +380,36 @@ void Parser::parseParameterListPrime(){
 		match(tc_SEMICOL);
 		parseIdentifierList(*(new EntryList()));
 		match(tc_COLON);
+		if(m_parserError){
+			TokenCode synch[] = {tc_COLON, tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
+			recover(synch);
+			if(isNext(tc_COLON)){
+				match(tc_COLON);
+			}
+		}
 		parseType();
 		parseParameterListPrime();
 	}
 }
 
 void Parser::parseCompoundStatement(){
-	const TokenCode synch[] = {tc_BEGIN, tc_DOT, tc_SEMICOL, tc_ELSE, tc_NONE};
-	if(! isNext(tc_BEGIN)){
-		setError("Expected a compound statement.");
+	match(tc_BEGIN);
+	if(m_parserError){
+		TokenCode synch[] = {tc_BEGIN, tc_IF, tc_WHILE, tc_ID, tc_END, tc_NONE};
 		recover(synch);
-		if(isNext(tc_DOT) || isNext(tc_SEMICOL) || isNext(tc_ELSE)){
-			return;
+		if(isNext(tc_BEGIN)){
+			match(tc_BEGIN);
 		}
 	}
-	match(tc_BEGIN);
 	parseOptionalStatements();
 	match(tc_END);
+	if(m_parserError){
+		TokenCode synch[] = {tc_END, tc_DOT, tc_SEMICOL, tc_ELSE, tc_NONE};
+		recover(synch);
+		if(isNext(tc_END)){
+			match(tc_END);
+		}
+	}
 }
 
 void Parser::parseOptionalStatements(){
@@ -283,14 +419,6 @@ void Parser::parseOptionalStatements(){
 }
 
 void Parser::parseStatementList(){
-	const TokenCode synch[] = {tc_BEGIN, tc_IF, tc_WHILE, tc_ID, tc_END, tc_NONE};
-	if(! (isNext(tc_BEGIN) || isNext(tc_IF) || isNext(tc_WHILE) || isNext(tc_ID))){
-		setError("Expected a statement list.");
-		recover(synch);
-		if(isNext(tc_END)){
-			return;
-		}
-	}
 	parseStatement();
 	parseStatementListPrime();
 }
@@ -304,35 +432,48 @@ void Parser::parseStatementListPrime(){
 }
 
 void Parser::parseStatement(){
-	const TokenCode synch[] = {tc_BEGIN, tc_IF,tc_WHILE, tc_ID, tc_SEMICOL, tc_ELSE, tc_END, tc_NONE};
-	if(! (isNext(tc_BEGIN) || isNext(tc_IF) || isNext(tc_ID) || isNext(tc_WHILE))){
-		setError("Expected a statement.");
-		recover(synch);
-		if(isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_END)){
-			return;
-		}
-	}
 	if(isNext(tc_ID)){
 		SymbolTableEntry* entry = m_currentToken->getSymTabEntry();
 		match(tc_ID);
 		parseStatementPrime(entry);
 	}
-	else if(isNext(tc_BEGIN)){
-		parseCompoundStatement();
-	}
 	else if(isNext(tc_IF)){
 		match(tc_IF);
 		parseExpression();
 		match(tc_THEN);
+		if(m_parserError){
+			TokenCode synch[] = {tc_THEN, tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
+			recover(synch);
+			if(isNext(tc_THEN)){
+				match(tc_THEN);
+			}
+		}
 		parseStatement();
 		match(tc_ELSE);
+		if(m_parserError){
+			TokenCode synch[] = {tc_ELSE, tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
+			recover(synch);
+			if(isNext(tc_ELSE)){
+				match(tc_ELSE);
+			}
+		}
 		parseStatement();
 	}
 	else if(isNext(tc_WHILE)){
 		match(tc_WHILE);
 		parseExpression();
 		match(tc_DO);
+		if(m_parserError){
+			TokenCode synch[] = {tc_DO, tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
+			recover(synch);
+			if(isNext(tc_DO)){
+				match(tc_DO);
+			}
+		}
 		parseStatement();
+	}
+	else{
+		parseCompoundStatement();
 	}
 }
 
@@ -340,6 +481,13 @@ void Parser::parseStatementPrime(SymbolTableEntry* prevEntry){
 	if(isNext(tc_LBRACKET) || isNext(tc_ASSIGNOP)){
 		parseVariablePrime(prevEntry);
 		match(tc_ASSIGNOP);
+		if(m_parserError){
+			TokenCode synch[] = {tc_ASSIGNOP, tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_NONE};
+			recover(synch);
+			if(isNext(tc_ASSIGNOP)){
+				match(tc_ASSIGNOP);
+			}
+		}
 		parseExpression();
 	}
 	else{
@@ -348,19 +496,18 @@ void Parser::parseStatementPrime(SymbolTableEntry* prevEntry){
 }
 
 SymbolTableEntry* Parser::parseVariable(){
-	const TokenCode synch[] = {tc_ID, tc_ASSIGNOP, tc_MULOP, tc_ADDOP, tc_RELOP, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_SEMICOL, tc_ELSE, tc_END, tc_NONE};
-	if(! isNext(tc_ID)){
-		setError("Expected a variable.");
-		recover(synch);
-		if(isNext(tc_ASSIGNOP) || isNext(tc_MULOP) || isNext(tc_ADDOP) || isNext(tc_RELOP) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_END)){
-			return NULL;
-		}
-	}
 	SymbolTableEntry* entry = NULL;
 	if(isNext(tc_ID)){
 		entry = m_currentToken->getSymTabEntry();
 	}
 	match(tc_ID);
+	if(m_parserError){
+		TokenCode synch[] = {tc_LBRACKET, tc_ID, tc_END, tc_ASSIGNOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RPAREN, tc_RBRACKET, tc_NONE};
+		recover(synch);
+		if(isNext(tc_ID)){
+			match(tc_ID);
+		}
+	}
 	entry = parseVariablePrime(entry);
 	return entry;
 }
@@ -370,24 +517,30 @@ SymbolTableEntry* Parser::parseVariablePrime(SymbolTableEntry* prevEntry){
 		match(tc_LBRACKET);
 		prevEntry = parseExpression();
 		match(tc_RBRACKET);
+		if(m_parserError){
+			TokenCode synch[] = {tc_RBRACKET, tc_END, tc_ASSIGNOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RPAREN, tc_NONE};
+			recover(synch);
+			if(isNext(tc_RBRACKET)){
+				match(tc_RBRACKET);
+			}
+		}
 	}
 	return prevEntry;
 }
 
 void Parser::parseProcedureStatement(){
-	const TokenCode synch[] = {tc_ID, tc_SEMICOL, tc_ELSE, tc_END, tc_NONE};
-	if(! isNext(tc_ID)){
-		setError("Expected a procedure statement.");
-		recover(synch);
-		if(isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_END)){
-			return;
-		}
-	}
 	SymbolTableEntry* entry = NULL;
 	if(isNext(tc_ID)){
 		entry = m_currentToken->getSymTabEntry();
 	}
 	match(tc_ID);
+	if(m_parserError){
+		TokenCode synch[] = {tc_LPAREN, tc_ID, tc_END, tc_SEMICOL, tc_ELSE, tc_NONE};
+		recover(synch);
+		if(isNext(tc_ID)){
+			match(tc_ID);
+		}
+	}
 	parseProcedureStatementPrime(entry);
 }
 
@@ -396,18 +549,17 @@ void Parser::parseProcedureStatementPrime(SymbolTableEntry* prevEntry){
 		match(tc_LPAREN);
 		parseExpressionList(prevEntry);
 		match(tc_RPAREN);
+		if(m_parserError){
+			TokenCode synch[] = {tc_RPAREN, tc_END, tc_SEMICOL, tc_ELSE, tc_NONE};
+			recover(synch);
+			if(isNext(tc_RPAREN)){
+				match(tc_RPAREN);
+			}
+		}
 	}
 }
 
 void Parser::parseExpressionList(SymbolTableEntry* prevEntry){
-	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_RPAREN, tc_NONE};
-	if(! (isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_LPAREN) || isNext(tc_NOT) || isNext(tc_ADDOP))){
-		setError("Expected an expression list.");
-		recover(synch);
-		if(isNext(tc_RPAREN)){
-			return;
-		}
-	}
 	EntryList expList = *(new EntryList());
 	expList.push_back(prevEntry);
 	expList.push_back(parseExpression());
@@ -423,14 +575,6 @@ void Parser::parseExpressionListPrime(EntryList& expList){
 }
 
 SymbolTableEntry* Parser::parseExpression(){
-	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_SEMICOL, tc_ELSE, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_END, tc_NONE};
-	if(! (isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_LPAREN) || isNext(tc_NOT) || isNext(tc_ADDOP))){
-		setError("Expected an expression.");
-		recover(synch);
-		if(isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_END)){
-			return NULL;
-		}
-	}
 	SymbolTableEntry* entry = parseSimpleExpression();
 	entry = parseExpressionPrime(entry);
 	return entry;
@@ -445,14 +589,6 @@ SymbolTableEntry* Parser::parseExpressionPrime(SymbolTableEntry* prevEntry){
 }
 
 SymbolTableEntry* Parser::parseSimpleExpression(){
-	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_SEMICOL, tc_ELSE, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_RELOP, tc_END, tc_NONE};
-		if(! (isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_LPAREN) || isNext(tc_NOT) || isNext(tc_ADDOP))){
-			setError("Expected a simple expression.");
-			recover(synch);
-			if(isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_RELOP) || isNext(tc_END)){
-				return NULL;
-			}
-		}
 	if(isNext(tc_ADDOP)){
 		parseSign();
 	}
@@ -471,14 +607,6 @@ SymbolTableEntry* Parser::parseSimpleExpressionPrime(SymbolTableEntry* prevEntry
 }
 
 SymbolTableEntry* Parser::parseTerm(){
-	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_RELOP, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_SEMICOL, tc_ELSE, tc_END, tc_NONE};
-	if(! (isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_LPAREN) || isNext(tc_NOT))){
-		setError("Expected a term.");
-		recover(synch);
-		if(isNext(tc_ADDOP) || isNext(tc_RELOP) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_END)){
-			return NULL;
-		}
-	}
 	SymbolTableEntry* entry = parseFactor();
 	entry = parseTermPrime(entry);
 	return entry;
@@ -494,31 +622,37 @@ SymbolTableEntry* Parser::parseTermPrime(SymbolTableEntry* prevEntry){
 }
 
 SymbolTableEntry* Parser::parseFactor(){
-	const TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_MULOP, tc_ADDOP, tc_RELOP, tc_THEN, tc_DO, tc_RBRACKET, tc_COMMA, tc_RPAREN, tc_SEMICOL, tc_ELSE, tc_END, tc_NONE};
-	if(! (isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_LPAREN) || isNext(tc_NOT))){
-		setError("Expected a factor.");
-		recover(synch);
-		if(isNext(tc_ADDOP) || isNext(tc_RELOP) || isNext(tc_THEN) || isNext(tc_DO) || isNext(tc_RBRACKET) || isNext(tc_COMMA) || isNext(tc_RPAREN) || isNext(tc_SEMICOL) || isNext(tc_ELSE) || isNext(tc_MULOP) || isNext(tc_END)){
-			return NULL;
-		}
-	}
 	SymbolTableEntry* entry = NULL;
 	if(isNext(tc_ID)){
 		entry = m_currentToken->getSymTabEntry();
 		match(tc_ID);
 		entry = parseFactorPrime(entry);
 	}
-	else if(isNext(tc_NUMBER)){
-		match(tc_NUMBER);
-	}
 	else if(isNext(tc_LPAREN)){
 		match(tc_LPAREN);
 		entry = parseExpression();
 		match(tc_RPAREN);
+		if(m_parserError){
+			TokenCode synch[] = {tc_RPAREN, tc_END, tc_ADDOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RBRACKET, tc_SEMICOL, tc_ELSE, tc_NONE};
+			recover(synch);
+			if(isNext(tc_RPAREN)){
+				match(tc_RPAREN);
+			}
+		}
 	}
 	else if(isNext(tc_NOT)){
 		match(tc_NOT);
 		parseFactor();
+	}
+	else{
+		match(tc_NUMBER);
+		if(m_parserError){
+			TokenCode synch[] = {tc_NUMBER, tc_RPAREN, tc_END, tc_ADDOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RBRACKET, tc_SEMICOL, tc_ELSE, tc_NONE};
+			recover(synch);
+			if(isNext(tc_NUMBER)){
+				match(tc_NUMBER);
+			}
+		}
 	}
 	return entry;
 }
@@ -531,17 +665,26 @@ SymbolTableEntry* Parser::parseFactorPrime(SymbolTableEntry* prevEntry){
 		match(tc_LPAREN);
 		parseExpressionList(prevEntry);
 		match(tc_RPAREN);
+		if(m_parserError){
+			TokenCode synch[] = {tc_RPAREN, tc_END, tc_ADDOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RBRACKET, tc_SEMICOL, tc_ELSE, tc_NONE};
+			recover(synch);
+			if(isNext(tc_RPAREN)){
+				match(tc_RPAREN);
+			}
+		}
 	}
 	return prevEntry;
 }
 
 void Parser::parseSign(){
-	const TokenCode synch[] = {tc_ADDOP, tc_ID, tc_NUMBER, tc_NOT, tc_NONE};
-	while(!(m_currentToken->getOpType() == op_PLUS || m_currentToken->getOpType() == op_MINUS)){
+	if(! isNext(tc_ADDOP) || ! (m_currentToken->getOpType() == op_PLUS || m_currentToken->getOpType() == op_MINUS)){
 		setError("Expected a sign.");
-		recover(synch);
-		if(isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_NOT)){
-			return;
+		TokenCode synch[] = {tc_ADDOP, tc_ID, tc_NUMBER, tc_NOT, tc_NONE};
+		while(!(m_currentToken->getOpType() == op_PLUS || m_currentToken->getOpType() == op_MINUS)){
+			recover(synch);
+			if(isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_NOT)){
+				return;
+			}
 		}
 	}
 	match(tc_ADDOP);
