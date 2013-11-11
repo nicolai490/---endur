@@ -98,49 +98,49 @@ bool Parser::isNext(TokenCode tc){
 void Parser::parseProgram(){
 	match(tc_PROGRAM);
 	if(m_parserError){
-		TokenCode synch[] = {tc_PROGRAM, tc_ID, tc_NONE};
+		TokenCode synch[] = {tc_ID, tc_NONE};
 		recover(synch);
-		if(isNext(tc_PROGRAM)){
-			match(tc_PROGRAM);
-		}
+//		if(isNext(tc_PROGRAM)){
+//			match(tc_PROGRAM);
+//		}
 	}
 	match(tc_ID);
 	if(m_parserError){
-		TokenCode synch[] = {tc_ID, tc_SEMICOL, tc_NONE};
+		TokenCode synch[] = {tc_SEMICOL, tc_NONE};
 		recover(synch);
-		if(isNext(tc_ID)){
-			match(tc_ID);
-		}
+//		if(isNext(tc_ID)){
+//			match(tc_ID);
+//		}
 	}
 	match(tc_SEMICOL);
 	if(m_parserError){
-		TokenCode synch[] = {tc_SEMICOL, tc_VAR, tc_FUNCTION, tc_PROCEDURE, tc_BEGIN, tc_NONE};
+		TokenCode synch[] = {tc_VAR, tc_FUNCTION, tc_PROCEDURE, tc_BEGIN, tc_NONE};
 		recover(synch);
-		if(isNext(tc_SEMICOL)){
-			match(tc_SEMICOL);
-		}
+//		if(isNext(tc_SEMICOL)){
+//			match(tc_SEMICOL);
+//		}
 	}
 	parseDeclarations();
 	parseSubprogramDeclarations();
 	parseCompoundStatement();
 	match(tc_DOT);
 	if(m_parserError){
-		TokenCode synch[] = {tc_DOT, tc_EOF, tc_NONE};
+		TokenCode synch[] = {tc_EOF, tc_NONE};
 		recover(synch);
-		if(isNext(tc_DOT)){
-			match(tc_DOT);
-		}
+//		if(isNext(tc_DOT)){
+//			match(tc_DOT);
+//		}
 	}
 }
 
 void Parser::parseIdentifierList(EntryList& idList){
 	match(tc_ID);
 	if(m_parserError){
-		TokenCode synch[] = {tc_COMMA, tc_COLON, tc_ID, tc_NONE};
+		TokenCode synch[] = {tc_COMMA, tc_COLON, tc_NONE};
 		recover(synch);
-		if(isNext(tc_ID)){
-			match(tc_ID);
-		}
+//		if(isNext(tc_ID)){
+//			match(tc_ID);
+//		}
 	}
 	parseIdentifierListPrime(idList);
 }
@@ -150,11 +150,11 @@ void Parser::parseIdentifierListPrime(EntryList& idList){
 		match(tc_COMMA);
 		match(tc_ID);
 		if(m_parserError){
-			TokenCode synch[] = {tc_COMMA, tc_COLON, tc_ID, tc_NONE};
+			TokenCode synch[] = {tc_COMMA, tc_COLON, tc_NONE};
 			recover(synch);
-			if(isNext(tc_ID)){
-				match(tc_ID);
-			}
+//			if(isNext(tc_ID)){
+//				match(tc_ID);
+//			}
 		}
 		parseIdentifierListPrime(idList);
 	}
@@ -166,20 +166,20 @@ void Parser::parseDeclarations(){
 		parseIdentifierList(*(new EntryList()));
 		match(tc_COLON);
 		if(m_parserError){
-			TokenCode synch[] = {tc_COLON, tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
+			TokenCode synch[] = {tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
 			recover(synch);
-			if(isNext(tc_COLON)){
-				match(tc_COLON);
-			}
+//			if(isNext(tc_COLON)){
+//				match(tc_COLON);
+//			}
 		}
 		parseType();
 		match(tc_SEMICOL);
 		if(m_parserError){
-			TokenCode synch[] = {tc_VAR, tc_FUNCTION, tc_BEGIN, tc_PROCEDURE, tc_SEMICOL, tc_NONE};
+			TokenCode synch[] = {tc_VAR, tc_FUNCTION, tc_BEGIN, tc_PROCEDURE, tc_NONE};
 			recover(synch);
-			if(isNext(tc_SEMICOL)){
-				match(tc_SEMICOL);
-			}
+//			if(isNext(tc_SEMICOL)){
+//				match(tc_SEMICOL);
+//			}
 		}
 		parseDeclarations();
 	}
@@ -189,59 +189,59 @@ void Parser::parseType(){
 	if(isNext(tc_ARRAY)){
 		match(tc_ARRAY);
 		if(m_parserError){
-			TokenCode synch[] = {tc_ARRAY, tc_LBRACKET, tc_NONE};
+			TokenCode synch[] = {tc_LBRACKET, tc_NONE};
 			recover(synch);
-			if(isNext(tc_ARRAY)){
-				match(tc_ARRAY);
-			}
+//			if(isNext(tc_ARRAY)){
+//				match(tc_ARRAY);
+//			}
 		}
 		match(tc_LBRACKET);
 		if(m_parserError){
-			TokenCode synch[] = {tc_LBRACKET, tc_NUMBER, tc_NONE};
+			TokenCode synch[] = {tc_NUMBER, tc_NONE};
 			recover(synch);
-			if(isNext(tc_LBRACKET)){
-				match(tc_LBRACKET);
-			}
+//			if(isNext(tc_LBRACKET)){
+//				match(tc_LBRACKET);
+//			}
 		}
 		match(tc_NUMBER);
 		if(m_parserError){
-			TokenCode synch[] = {tc_NUMBER, tc_DOTDOT, tc_NONE};
+			TokenCode synch[] = {tc_DOTDOT, tc_NONE};
 			recover(synch);
-			if(isNext(tc_NUMBER)){
-				match(tc_NUMBER);
-			}
+//			if(isNext(tc_NUMBER)){
+//				match(tc_NUMBER);
+//			}
 		}
 		match(tc_DOTDOT);
 		if(m_parserError){
-			TokenCode synch[] = {tc_NUMBER, tc_DOTDOT, tc_NONE};
+			TokenCode synch[] = {tc_NUMBER, tc_NONE};
 			recover(synch);
-			if(isNext(tc_DOTDOT)){
-				match(tc_DOTDOT);
-			}
+//			if(isNext(tc_DOTDOT)){
+//				match(tc_DOTDOT);
+//			}
 		}
 		match(tc_NUMBER);
 		if(m_parserError){
-			TokenCode synch[] = {tc_NUMBER, tc_RBRACKET, tc_NONE};
+			TokenCode synch[] = {tc_RBRACKET, tc_NONE};
 			recover(synch);
-			if(isNext(tc_NUMBER)){
-				match(tc_NUMBER);
-			}
+//			if(isNext(tc_NUMBER)){
+//				match(tc_NUMBER);
+//			}
 		}
 		match(tc_RBRACKET);
 		if(m_parserError){
-			TokenCode synch[] = {tc_RBRACKET, tc_OF, tc_NONE};
+			TokenCode synch[] = {tc_OF, tc_NONE};
 			recover(synch);
-			if(isNext(tc_RBRACKET)){
-				match(tc_RBRACKET);
-			}
+//			if(isNext(tc_RBRACKET)){
+//				match(tc_RBRACKET);
+//			}
 		}
 		match(tc_OF);
 		if(m_parserError){
-			TokenCode synch[] = {tc_OF, tc_INTEGER, tc_REAL, tc_NONE};
+			TokenCode synch[] = {tc_INTEGER, tc_REAL, tc_NONE};
 			recover(synch);
-			if(isNext(tc_OF)){
-				match(tc_OF);
-			}
+//			if(isNext(tc_OF)){
+//				match(tc_OF);
+//			}
 		}
 		parseStandardType();
 	}
@@ -257,11 +257,11 @@ void Parser::parseStandardType(){
 	else{
 		match(tc_REAL);
 		if(m_parserError){
-			TokenCode synch[] = {tc_REAL, tc_SEMICOL, tc_NONE};
+			TokenCode synch[] = {tc_SEMICOL, tc_NONE};
 			recover(synch);
-			if(isNext(tc_REAL)){
-				match(tc_REAL);
-			}
+//			if(isNext(tc_REAL)){
+//				match(tc_REAL);
+//			}
 		}
 	}
 }
@@ -271,11 +271,11 @@ void Parser::parseSubprogramDeclarations(){
 		parseSubprogramDeclaration();
 		match(tc_SEMICOL);
 		if(m_parserError){
-			TokenCode synch[] = {tc_SEMICOL, tc_FUNCTION, tc_PROCEDURE, tc_BEGIN, tc_NONE};
+			TokenCode synch[] = {tc_FUNCTION, tc_PROCEDURE, tc_BEGIN, tc_NONE};
 			recover(synch);
-			if(isNext(tc_SEMICOL)){
-				match(tc_SEMICOL);
-			}
+//			if(isNext(tc_SEMICOL)){
+//				match(tc_SEMICOL);
+//			}
 		}
 		parseSubprogramDeclarations();
 	}
@@ -292,56 +292,56 @@ void Parser::parseSubprogramHead(){
 		match(tc_FUNCTION);
 		match(tc_ID);
 		if(m_parserError){
-			TokenCode synch[] = {tc_LPAREN, tc_COLON, tc_ID, tc_NONE};
+			TokenCode synch[] = {tc_LPAREN, tc_COLON, tc_NONE};
 			recover(synch);
-			if(isNext(tc_ID)){
-				match(tc_ID);
-			}
+//			if(isNext(tc_ID)){
+//				match(tc_ID);
+//			}
 		}
 		parseArguments();
 		match(tc_COLON);
 		if(m_parserError){
-			TokenCode synch[] = {tc_COLON, tc_INTEGER, tc_REAL, tc_NONE};
+			TokenCode synch[] = {tc_INTEGER, tc_REAL, tc_NONE};
 			recover(synch);
-			if(isNext(tc_COLON)){
-				match(tc_COLON);
-			}
+//			if(isNext(tc_COLON)){
+//				match(tc_COLON);
+//			}
 		}
 		parseStandardType();
 		match(tc_SEMICOL);
 		if(m_parserError){
-			TokenCode synch[] = {tc_SEMICOL, tc_VAR, tc_BEGIN, tc_NONE};
+			TokenCode synch[] = {tc_VAR, tc_BEGIN, tc_NONE};
 			recover(synch);
-			if(isNext(tc_SEMICOL)){
-				match(tc_SEMICOL);
-			}
+//			if(isNext(tc_SEMICOL)){
+//				match(tc_SEMICOL);
+//			}
 		}
 	}
 	else{
 		match(tc_PROCEDURE);
 		if(m_parserError){
-			TokenCode synch[] = {tc_PROCEDURE, tc_ID, tc_NONE};
+			TokenCode synch[] = {tc_ID, tc_NONE};
 			recover(synch);
-			if(isNext(tc_PROCEDURE)){
-				match(tc_PROCEDURE);
-			}
+//			if(isNext(tc_PROCEDURE)){
+//				match(tc_PROCEDURE);
+//			}
 		}
 		match(tc_ID);
 		if(m_parserError){
-			TokenCode synch[] = {tc_LPAREN, tc_SEMICOL, tc_ID, tc_NONE};
+			TokenCode synch[] = {tc_LPAREN, tc_SEMICOL, tc_NONE};
 			recover(synch);
-			if(isNext(tc_ID)){
-				match(tc_ID);
-			}
+//			if(isNext(tc_ID)){
+//				match(tc_ID);
+//			}
 		}
 		parseArguments();
 		match(tc_SEMICOL);
 		if(m_parserError){
-			TokenCode synch[] = {tc_SEMICOL, tc_VAR, tc_BEGIN, tc_NONE};
+			TokenCode synch[] = {tc_VAR, tc_BEGIN, tc_NONE};
 			recover(synch);
-			if(isNext(tc_SEMICOL)){
-				match(tc_SEMICOL);
-			}
+//			if(isNext(tc_SEMICOL)){
+//				match(tc_SEMICOL);
+//			}
 		}
 	}
 }
@@ -352,11 +352,11 @@ void Parser::parseArguments(){
 		parseParameterList();
 		match(tc_RPAREN);
 		if(m_parserError){
-			TokenCode synch[] = {tc_RPAREN, tc_COLON, tc_SEMICOL, tc_NONE};
+			TokenCode synch[] = {tc_COLON, tc_SEMICOL, tc_NONE};
 			recover(synch);
-			if(isNext(tc_RPAREN)){
-				match(tc_RPAREN);
-			}
+//			if(isNext(tc_RPAREN)){
+//				match(tc_RPAREN);
+//			}
 		}
 	}
 }
@@ -365,11 +365,11 @@ void Parser::parseParameterList(){
 	parseIdentifierList(*(new EntryList()));
 	match(tc_COLON);
 	if(m_parserError){
-		TokenCode synch[] = {tc_COLON, tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
+		TokenCode synch[] = {tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
 		recover(synch);
-		if(isNext(tc_COLON)){
-			match(tc_COLON);
-		}
+//		if(isNext(tc_COLON)){
+//			match(tc_COLON);
+//		}
 	}
 	parseType();
 	parseParameterListPrime();
@@ -381,11 +381,11 @@ void Parser::parseParameterListPrime(){
 		parseIdentifierList(*(new EntryList()));
 		match(tc_COLON);
 		if(m_parserError){
-			TokenCode synch[] = {tc_COLON, tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
+			TokenCode synch[] = {tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
 			recover(synch);
-			if(isNext(tc_COLON)){
-				match(tc_COLON);
-			}
+//			if(isNext(tc_COLON)){
+//				match(tc_COLON);
+//			}
 		}
 		parseType();
 		parseParameterListPrime();
@@ -397,18 +397,18 @@ void Parser::parseCompoundStatement(){
 	if(m_parserError){
 		TokenCode synch[] = {tc_BEGIN, tc_IF, tc_WHILE, tc_ID, tc_END, tc_NONE};
 		recover(synch);
-		if(isNext(tc_BEGIN)){
-			match(tc_BEGIN);
-		}
+//		if(isNext(tc_BEGIN)){
+//			match(tc_BEGIN);
+//		}
 	}
 	parseOptionalStatements();
 	match(tc_END);
 	if(m_parserError){
 		TokenCode synch[] = {tc_END, tc_DOT, tc_SEMICOL, tc_ELSE, tc_NONE};
 		recover(synch);
-		if(isNext(tc_END)){
-			match(tc_END);
-		}
+//		if(isNext(tc_END)){
+//			match(tc_END);
+//		}
 	}
 }
 
@@ -442,20 +442,20 @@ void Parser::parseStatement(){
 		parseExpression();
 		match(tc_THEN);
 		if(m_parserError){
-			TokenCode synch[] = {tc_THEN, tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
+			TokenCode synch[] = {tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
 			recover(synch);
-			if(isNext(tc_THEN)){
-				match(tc_THEN);
-			}
+//			if(isNext(tc_THEN)){
+//				match(tc_THEN);
+//			}
 		}
 		parseStatement();
 		match(tc_ELSE);
 		if(m_parserError){
-			TokenCode synch[] = {tc_ELSE, tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
+			TokenCode synch[] = {tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
 			recover(synch);
-			if(isNext(tc_ELSE)){
-				match(tc_ELSE);
-			}
+//			if(isNext(tc_ELSE)){
+//				match(tc_ELSE);
+//			}
 		}
 		parseStatement();
 	}
@@ -464,11 +464,11 @@ void Parser::parseStatement(){
 		parseExpression();
 		match(tc_DO);
 		if(m_parserError){
-			TokenCode synch[] = {tc_DO, tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
+			TokenCode synch[] = {tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
 			recover(synch);
-			if(isNext(tc_DO)){
-				match(tc_DO);
-			}
+//			if(isNext(tc_DO)){
+//				match(tc_DO);
+//			}
 		}
 		parseStatement();
 	}
@@ -482,11 +482,11 @@ void Parser::parseStatementPrime(SymbolTableEntry* prevEntry){
 		parseVariablePrime(prevEntry);
 		match(tc_ASSIGNOP);
 		if(m_parserError){
-			TokenCode synch[] = {tc_ASSIGNOP, tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_NONE};
+			TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_NONE};
 			recover(synch);
-			if(isNext(tc_ASSIGNOP)){
-				match(tc_ASSIGNOP);
-			}
+//			if(isNext(tc_ASSIGNOP)){
+//				match(tc_ASSIGNOP);
+//			}
 		}
 		parseExpression();
 	}
@@ -502,11 +502,11 @@ SymbolTableEntry* Parser::parseVariable(){
 	}
 	match(tc_ID);
 	if(m_parserError){
-		TokenCode synch[] = {tc_LBRACKET, tc_ID, tc_END, tc_ASSIGNOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RPAREN, tc_RBRACKET, tc_NONE};
+		TokenCode synch[] = {tc_LBRACKET, tc_END, tc_ASSIGNOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RPAREN, tc_RBRACKET, tc_NONE};
 		recover(synch);
-		if(isNext(tc_ID)){
-			match(tc_ID);
-		}
+//		if(isNext(tc_ID)){
+//			match(tc_ID);
+//		}
 	}
 	entry = parseVariablePrime(entry);
 	return entry;
@@ -520,9 +520,9 @@ SymbolTableEntry* Parser::parseVariablePrime(SymbolTableEntry* prevEntry){
 		if(m_parserError){
 			TokenCode synch[] = {tc_RBRACKET, tc_END, tc_ASSIGNOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RPAREN, tc_NONE};
 			recover(synch);
-			if(isNext(tc_RBRACKET)){
-				match(tc_RBRACKET);
-			}
+//			if(isNext(tc_RBRACKET)){
+//				match(tc_RBRACKET);
+//			}
 		}
 	}
 	return prevEntry;
@@ -535,11 +535,11 @@ void Parser::parseProcedureStatement(){
 	}
 	match(tc_ID);
 	if(m_parserError){
-		TokenCode synch[] = {tc_LPAREN, tc_ID, tc_END, tc_SEMICOL, tc_ELSE, tc_NONE};
+		TokenCode synch[] = {tc_LPAREN, tc_END, tc_SEMICOL, tc_ELSE, tc_NONE};
 		recover(synch);
-		if(isNext(tc_ID)){
-			match(tc_ID);
-		}
+//		if(isNext(tc_ID)){
+//			match(tc_ID);
+//		}
 	}
 	parseProcedureStatementPrime(entry);
 }
@@ -550,11 +550,11 @@ void Parser::parseProcedureStatementPrime(SymbolTableEntry* prevEntry){
 		parseExpressionList(prevEntry);
 		match(tc_RPAREN);
 		if(m_parserError){
-			TokenCode synch[] = {tc_RPAREN, tc_END, tc_SEMICOL, tc_ELSE, tc_NONE};
+			TokenCode synch[] = {tc_END, tc_SEMICOL, tc_ELSE, tc_NONE};
 			recover(synch);
-			if(isNext(tc_RPAREN)){
-				match(tc_RPAREN);
-			}
+//			if(isNext(tc_RPAREN)){
+//				match(tc_RPAREN);
+//			}
 		}
 	}
 }
@@ -635,9 +635,9 @@ SymbolTableEntry* Parser::parseFactor(){
 		if(m_parserError){
 			TokenCode synch[] = {tc_RPAREN, tc_END, tc_ADDOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RBRACKET, tc_SEMICOL, tc_ELSE, tc_NONE};
 			recover(synch);
-			if(isNext(tc_RPAREN)){
-				match(tc_RPAREN);
-			}
+//			if(isNext(tc_RPAREN)){
+//				match(tc_RPAREN);
+//			}
 		}
 	}
 	else if(isNext(tc_NOT)){
@@ -647,11 +647,11 @@ SymbolTableEntry* Parser::parseFactor(){
 	else{
 		match(tc_NUMBER);
 		if(m_parserError){
-			TokenCode synch[] = {tc_NUMBER, tc_RPAREN, tc_END, tc_ADDOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RBRACKET, tc_SEMICOL, tc_ELSE, tc_NONE};
+			TokenCode synch[] = {tc_RPAREN, tc_END, tc_ADDOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RBRACKET, tc_SEMICOL, tc_ELSE, tc_NONE};
 			recover(synch);
-			if(isNext(tc_NUMBER)){
-				match(tc_NUMBER);
-			}
+//			if(isNext(tc_NUMBER)){
+//				match(tc_NUMBER);
+//			}
 		}
 	}
 	return entry;
@@ -668,24 +668,22 @@ SymbolTableEntry* Parser::parseFactorPrime(SymbolTableEntry* prevEntry){
 		if(m_parserError){
 			TokenCode synch[] = {tc_RPAREN, tc_END, tc_ADDOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RBRACKET, tc_SEMICOL, tc_ELSE, tc_NONE};
 			recover(synch);
-			if(isNext(tc_RPAREN)){
-				match(tc_RPAREN);
-			}
+//			if(isNext(tc_RPAREN)){
+//				match(tc_RPAREN);
+//			}
 		}
 	}
 	return prevEntry;
 }
 
 void Parser::parseSign(){
-	if(! isNext(tc_ADDOP) || ! (m_currentToken->getOpType() == op_PLUS || m_currentToken->getOpType() == op_MINUS)){
-		setError("Expected a sign.");
-		TokenCode synch[] = {tc_ADDOP, tc_ID, tc_NUMBER, tc_NOT, tc_NONE};
-		while(!(m_currentToken->getOpType() == op_PLUS || m_currentToken->getOpType() == op_MINUS)){
-			recover(synch);
-			if(isNext(tc_ID) || isNext(tc_NUMBER) || isNext(tc_NOT)){
-				return;
-			}
-		}
-	}
+	OpType t = m_currentToken->getOpType();
 	match(tc_ADDOP);
+	if(m_parserError || (t != op_PLUS && t != op_MINUS)){
+		if(!m_parserError){
+			setError("Expected a sign.");
+		}
+		TokenCode synch[] = {tc_ID, tc_NUMBER, tc_NOT, tc_NONE};
+		recover(synch);
+	}
 }
