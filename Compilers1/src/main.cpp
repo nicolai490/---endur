@@ -1,6 +1,7 @@
 #include "parser.h"
 
 int main(){
+	
 	Parser* parser = new Parser(std::cin, std::cout);
 	parser->parse();
 	int errs = parser->totalErrors();

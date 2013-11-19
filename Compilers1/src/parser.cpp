@@ -15,12 +15,14 @@ Parser::Parser(std::istream& input, std::ostream& output){
 	m_lexan = new Scanner(m_symbolTable, input, output);
 	m_totalErrors = 0;
 	m_parserError = false;
+	m_code = new Code();
 	getToken();
 }
 
 Parser::~Parser(){
 	delete m_symbolTable;
 	delete m_lexan;
+	delete m_code;
 }
 
 void Parser::parse(){
@@ -624,15 +626,16 @@ SymbolTableEntry* Parser::parseTermPrime(SymbolTableEntry* prevEntry){
 }
 
 SymbolTableEntry* Parser::parseFactor(){
-	SymbolTableEntry* entry = NULL;
+	SymbolTableEntry* factor = NULL;
+	SymbolTableEntry* result = m_symbolTable->lookup(CodeFalse);
 	if(isNext(tc_ID)){
-		entry = m_currentToken->getSymTabEntry();
+		factor = m_currentToken->getSymTabEntry();
 		match(tc_ID);
-		entry = parseFactorPrime(entry);
+		result = parseFactorPrime(factor);
 	}
 	else if(isNext(tc_LPAREN)){
 		match(tc_LPAREN);
-		entry = parseExpression();
+		result = parseExpression();
 		match(tc_RPAREN);
 		if(m_parserError){
 			TokenCode synch[] = {tc_RPAREN, tc_END, tc_ADDOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RBRACKET, tc_SEMICOL, tc_ELSE, tc_NONE};
@@ -644,9 +647,12 @@ SymbolTableEntry* Parser::parseFactor(){
 	}
 	else if(isNext(tc_NOT)){
 		match(tc_NOT);
-		parseFactor();
+		factor = parseFactor();
+		result = newTemp();
+		m_code->generate(cd_NOT, factor, NULL, result);
 	}
 	else{
+		result = m_currentToken->getSymTabEntry();
 		match(tc_NUMBER);
 		if(m_parserError){
 			TokenCode synch[] = {tc_RPAREN, tc_END, tc_ADDOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RBRACKET, tc_SEMICOL, tc_ELSE, tc_NONE};
@@ -656,7 +662,7 @@ SymbolTableEntry* Parser::parseFactor(){
 //			}
 		}
 	}
-	return entry;
+	return result;
 }
 
 SymbolTableEntry* Parser::parseFactorPrime(SymbolTableEntry* prevEntry){
@@ -688,4 +694,12 @@ void Parser::parseSign(){
 		TokenCode synch[] = {tc_ID, tc_NUMBER, tc_NOT, tc_NONE};
 		recover(synch);
 	}
+}
+
+SymbolTableEntry* Parser::newLabel(){
+	return m_symbolTable->insert(m_code->newLabel());
+}
+
+SymbolTableEntry* Parser::newTemp(){
+	return m_symbolTable->insert(m_code->newTemp());
 }

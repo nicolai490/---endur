@@ -30,5 +30,27 @@ void Quadruple::set(enum CodeOp op, SymbolTableEntry* arg1, SymbolTableEntry* ar
 }
 
 Code::Code(){
+	m_qList = *(new QuadrupleList());
+	m_tempCounter = 0;
+	m_labelCounter = 0;
+}
+
+Code::~Code(){
 	
+}
+
+void Code::generate(enum CodeOp op, SymbolTableEntry* arg1, SymbolTableEntry* arg2, SymbolTableEntry* result){
+	m_qList.push_back(*(new Quadruple(op, arg1, arg2, result)));
+}
+
+std::string Code::newLabel(){
+	std::stringstream s;
+	s << CodeLabelPrefix << m_labelCounter++;
+	return s.str();
+}
+
+std::string Code::newTemp(){
+	std::stringstream s;
+	s << CodeTempVarPrefix << m_tempCounter++;
+	return s.str();
 }
