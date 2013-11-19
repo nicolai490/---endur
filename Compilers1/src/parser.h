@@ -12,7 +12,7 @@
 #include "scanner.h"
 
 /* Code Generation includes, uncomment in part 3 */
-//#include "code.h"
+#include "code.h"
 
 class Parser {
 
@@ -74,14 +74,14 @@ public:
 	int totalErrors();
 	
 /* Code generation, implement in part 3, uncomment then */
-/*private:
+private:
 	Code*  m_code;			// The Target Code
 	
 	SymbolTableEntry* newLabel();	// Generate a new symbol table entry for a new code label
 	SymbolTableEntry* newTemp();	// Generate a new symbol table entry for a new temporary variable
 	CodeOp opToCode(OpType op);	// Get the corresponding operator in the target code based on the operator type
 public:
-	Code* getCode();	// Getter for the target code*/
+	Code* getCode();	// Getter for the target code
 
 };
 

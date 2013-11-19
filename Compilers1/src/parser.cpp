@@ -10,6 +10,8 @@
 
 Parser::Parser(std::istream& input, std::ostream& output){
 	m_symbolTable = new SymbolTable();
+	m_symbolTable->insert(CodeFalse);
+	m_symbolTable->insert(CodeTrue);
 	m_lexan = new Scanner(m_symbolTable, input, output);
 	m_totalErrors = 0;
 	m_parserError = false;
