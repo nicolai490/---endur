@@ -54,3 +54,28 @@ std::string Code::newTemp(){
 	s << CodeTempVarPrefix << m_tempCounter++;
 	return s.str();
 }
+
+void Code::generateFormals(EntryList &entrylist){
+	for(int i = 0; i < (int)entrylist.size(); i++){
+		generate(cd_FPARAM, NULL, NULL, entrylist[i]);
+	}
+}
+
+void Code::generateVariables(EntryList &entrylist){
+	for(int i = 0; i < (int)entrylist.size(); i++){
+		generate(cd_VAR, NULL, NULL, entrylist[i]);
+	}
+}
+
+void Code::generateCall(SymbolTableEntry* entry, EntryList &eList){
+	for(int i = 0; i < (int)eList.size(); i++){
+		generate(cd_APARAM, NULL, NULL, eList[i]);
+	}
+	generate(cd_CALL, entry, NULL, NULL);
+}
+
+void Code::print(){
+	for(int i = 0; i < (int)m_qList.size(); i++){
+		Quadruple::print(m_qList[i]);
+	}
+}

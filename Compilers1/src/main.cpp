@@ -7,7 +7,7 @@ int main(){
 	int errs = parser->totalErrors();
 	delete parser;
 	if(errs == 0){
-		std::cout << "No errors.\n";
+		//std::cout << "No errors.\n";
 	}
 	else{
 		std::cout << "Number of errors: " << errs << ".\n";

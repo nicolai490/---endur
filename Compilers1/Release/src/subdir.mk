@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../src/code.cpp \
 ../src/main.cpp \
 ../src/parser.cpp \
 ../src/scanner.cpp \
@@ -12,6 +13,7 @@ CPP_SRCS += \
 ../src/token.cpp 
 
 OBJS += \
+./src/code.o \
 ./src/main.o \
 ./src/parser.o \
 ./src/scanner.o \
@@ -20,6 +22,7 @@ OBJS += \
 ./src/token.o 
 
 CPP_DEPS += \
+./src/code.d \
 ./src/main.d \
 ./src/parser.d \
 ./src/scanner.d \

@@ -28,6 +28,7 @@ Parser::~Parser(){
 void Parser::parse(){
 	parseProgram();
 	match(tc_EOF);
+	m_code->print();
 }
 
 SymbolTable* Parser::getSymbolTable(){
@@ -125,7 +126,10 @@ void Parser::parseProgram(){
 //		}
 	}
 	parseDeclarations();
+	SymbolTableEntry* start = newLabel();
+	m_code->generate(cd_GOTO, NULL, NULL, start);
 	parseSubprogramDeclarations();
+	m_code->generate(cd_LABEL, NULL, NULL, start);
 	parseCompoundStatement();
 	match(tc_DOT);
 	if(m_parserError){
@@ -135,9 +139,13 @@ void Parser::parseProgram(){
 //			match(tc_DOT);
 //		}
 	}
+	m_code->generate(cd_RETURN, NULL, NULL, NULL);
 }
 
 void Parser::parseIdentifierList(EntryList& idList){
+	if(isNext(tc_ID)){
+		idList.push_back(m_currentToken->getSymTabEntry());
+	}
 	match(tc_ID);
 	if(m_parserError){
 		TokenCode synch[] = {tc_COMMA, tc_COLON, tc_NONE};
@@ -152,6 +160,9 @@ void Parser::parseIdentifierList(EntryList& idList){
 void Parser::parseIdentifierListPrime(EntryList& idList){
 	if(isNext(tc_COMMA)){
 		match(tc_COMMA);
+		if(isNext(tc_ID)){
+			idList.push_back(m_currentToken->getSymTabEntry());
+		}
 		match(tc_ID);
 		if(m_parserError){
 			TokenCode synch[] = {tc_COMMA, tc_COLON, tc_NONE};
@@ -167,7 +178,8 @@ void Parser::parseIdentifierListPrime(EntryList& idList){
 void Parser::parseDeclarations(){
 	if(isNext(tc_VAR)){
 		match(tc_VAR);
-		parseIdentifierList(*(new EntryList()));
+		EntryList ids = *(new EntryList());
+		parseIdentifierList(ids);
 		match(tc_COLON);
 		if(m_parserError){
 			TokenCode synch[] = {tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
@@ -177,6 +189,7 @@ void Parser::parseDeclarations(){
 //			}
 		}
 		parseType();
+		m_code->generateVariables(ids);
 		match(tc_SEMICOL);
 		if(m_parserError){
 			TokenCode synch[] = {tc_VAR, tc_FUNCTION, tc_BEGIN, tc_PROCEDURE, tc_NONE};
@@ -286,9 +299,12 @@ void Parser::parseSubprogramDeclarations(){
 }
 
 void Parser::parseSubprogramDeclaration(){
+	SymbolTableEntry* lab = newLabel();
+	m_code->generate(cd_LABEL, NULL, NULL, lab);
 	parseSubprogramHead();
 	parseDeclarations();
 	parseCompoundStatement();
+	m_code->generate(cd_RETURN, NULL, NULL, NULL);
 }
 
 void Parser::parseSubprogramHead(){
@@ -366,7 +382,8 @@ void Parser::parseArguments(){
 }
 
 void Parser::parseParameterList(){
-	parseIdentifierList(*(new EntryList()));
+	EntryList ids = *(new EntryList());
+	parseIdentifierList(ids);
 	match(tc_COLON);
 	if(m_parserError){
 		TokenCode synch[] = {tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
@@ -376,13 +393,15 @@ void Parser::parseParameterList(){
 //		}
 	}
 	parseType();
+	m_code->generateFormals(ids);
 	parseParameterListPrime();
 }
 
 void Parser::parseParameterListPrime(){
 	if(isNext(tc_SEMICOL)){
 		match(tc_SEMICOL);
-		parseIdentifierList(*(new EntryList()));
+		EntryList ids = *(new EntryList());
+		parseIdentifierList(ids);
 		match(tc_COLON);
 		if(m_parserError){
 			TokenCode synch[] = {tc_ARRAY, tc_INTEGER, tc_REAL, tc_NONE};
@@ -392,6 +411,7 @@ void Parser::parseParameterListPrime(){
 //			}
 		}
 		parseType();
+		m_code->generateFormals(ids);
 		parseParameterListPrime();
 	}
 }
@@ -443,7 +463,10 @@ void Parser::parseStatement(){
 	}
 	else if(isNext(tc_IF)){
 		match(tc_IF);
-		parseExpression();
+		SymbolTableEntry* exp = parseExpression();
+		SymbolTableEntry* f = newLabel();
+		SymbolTableEntry* end = newLabel();
+		m_code->generate(cd_EQ, exp, m_symbolTable->lookup(CodeFalse), f);
 		match(tc_THEN);
 		if(m_parserError){
 			TokenCode synch[] = {tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
@@ -453,6 +476,8 @@ void Parser::parseStatement(){
 //			}
 		}
 		parseStatement();
+		m_code->generate(cd_GOTO, NULL, NULL, end);
+		m_code->generate(cd_LABEL, NULL, NULL, f);
 		match(tc_ELSE);
 		if(m_parserError){
 			TokenCode synch[] = {tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
@@ -462,10 +487,15 @@ void Parser::parseStatement(){
 //			}
 		}
 		parseStatement();
+		m_code->generate(cd_LABEL, NULL, NULL, end);
 	}
 	else if(isNext(tc_WHILE)){
 		match(tc_WHILE);
-		parseExpression();
+		SymbolTableEntry* start = newLabel();
+		m_code->generate(cd_LABEL, NULL, NULL, start);
+		SymbolTableEntry* exp = parseExpression();
+		SymbolTableEntry* end = newLabel();
+		m_code->generate(cd_EQ, exp, m_symbolTable->lookup(CodeFalse), end);
 		match(tc_DO);
 		if(m_parserError){
 			TokenCode synch[] = {tc_ID, tc_BEGIN, tc_IF, tc_WHILE, tc_NONE};
@@ -475,6 +505,8 @@ void Parser::parseStatement(){
 //			}
 		}
 		parseStatement();
+		m_code->generate(cd_GOTO, NULL, NULL, start);
+		m_code->generate(cd_LABEL, NULL, NULL, end);
 	}
 	else{
 		parseCompoundStatement();
@@ -483,7 +515,7 @@ void Parser::parseStatement(){
 
 void Parser::parseStatementPrime(SymbolTableEntry* prevEntry){
 	if(isNext(tc_LBRACKET) || isNext(tc_ASSIGNOP)){
-		parseVariablePrime(prevEntry);
+		SymbolTableEntry* var = parseVariablePrime(prevEntry);
 		match(tc_ASSIGNOP);
 		if(m_parserError){
 			TokenCode synch[] = {tc_ID, tc_NUMBER, tc_LPAREN, tc_NOT, tc_ADDOP, tc_NONE};
@@ -492,7 +524,8 @@ void Parser::parseStatementPrime(SymbolTableEntry* prevEntry){
 //				match(tc_ASSIGNOP);
 //			}
 		}
-		parseExpression();
+		SymbolTableEntry* exp = parseExpression();
+		m_code->generate(cd_ASSIGN, exp, NULL, var);
 	}
 	else{
 		parseProcedureStatementPrime(prevEntry);
@@ -519,7 +552,7 @@ SymbolTableEntry* Parser::parseVariable(){
 SymbolTableEntry* Parser::parseVariablePrime(SymbolTableEntry* prevEntry){
 	if(isNext(tc_LBRACKET)){
 		match(tc_LBRACKET);
-		prevEntry = parseExpression();
+		parseExpression();
 		match(tc_RBRACKET);
 		if(m_parserError){
 			TokenCode synch[] = {tc_RBRACKET, tc_END, tc_ASSIGNOP, tc_MULOP, tc_RELOP, tc_THEN, tc_DO, tc_COMMA, tc_RPAREN, tc_NONE};
@@ -565,9 +598,10 @@ void Parser::parseProcedureStatementPrime(SymbolTableEntry* prevEntry){
 
 void Parser::parseExpressionList(SymbolTableEntry* prevEntry){
 	EntryList expList = *(new EntryList());
-	expList.push_back(prevEntry);
+	//expList.push_back(prevEntry);
 	expList.push_back(parseExpression());
 	parseExpressionListPrime(expList);
+	m_code->generateCall(prevEntry, expList);
 }
 
 void Parser::parseExpressionListPrime(EntryList& expList){
@@ -585,42 +619,108 @@ SymbolTableEntry* Parser::parseExpression(){
 }
 
 SymbolTableEntry* Parser::parseExpressionPrime(SymbolTableEntry* prevEntry){
+	SymbolTableEntry* result = prevEntry;
 	if(isNext(tc_RELOP)){
+		OpType t = m_currentToken->getOpType();
 		match(tc_RELOP);
-		prevEntry = parseSimpleExpression();
+		SymbolTableEntry* exp = parseSimpleExpression();
+		result = newTemp();
+		SymbolTableEntry* tr = newLabel();
+		SymbolTableEntry* end = newLabel();
+		if(t == op_LT){
+			m_code->generate(cd_LT, prevEntry, exp, tr);
+		}
+		else if(t == op_LE){
+			m_code->generate(cd_LE, prevEntry, exp, tr);
+		}
+		else if(t == op_GT){
+			m_code->generate(cd_GT, prevEntry, exp, tr);
+		}
+		else if(t == op_GE){
+			m_code->generate(cd_GE, prevEntry, exp, tr);
+		}
+		else if(t == op_EQ){
+			m_code->generate(cd_EQ, prevEntry, exp, tr);
+		}
+		else{
+			m_code->generate(cd_NE, prevEntry, exp, tr);
+		}
+		m_code->generate(cd_ASSIGN, m_symbolTable->lookup(CodeFalse), NULL, result);
+		m_code->generate(cd_GOTO, NULL, NULL, end);
+		m_code->generate(cd_LABEL, NULL, NULL, tr);
+		m_code->generate(cd_ASSIGN, m_symbolTable->lookup(CodeTrue), NULL, result);
+		m_code->generate(cd_LABEL, NULL, NULL, end);
 	}
-	return prevEntry;
+	return result;
 }
 
 SymbolTableEntry* Parser::parseSimpleExpression(){
+	int sign = false;
 	if(isNext(tc_ADDOP)){
+		if(m_currentToken->getOpType() == op_MINUS){
+			sign = true;
+		}
 		parseSign();
 	}
 	SymbolTableEntry* entry = parseTerm();
 	entry = parseSimpleExpressionPrime(entry);
-	return entry;
+	SymbolTableEntry* result = entry;
+	if(sign){
+		result = newTemp();
+		m_code->generate(cd_UMINUS, entry, NULL, result);
+	}
+	return result;
 }
 
 SymbolTableEntry* Parser::parseSimpleExpressionPrime(SymbolTableEntry* prevEntry){
+	SymbolTableEntry* temp = prevEntry;
 	if(isNext(tc_ADDOP)){
+		OpType t = m_currentToken->getOpType();
 		match(tc_ADDOP);
-		parseTerm();
-		prevEntry = parseSimpleExpressionPrime(prevEntry);
+		temp = newTemp();
+		SymbolTableEntry* term = parseTerm();
+		if(t == op_PLUS){
+			m_code->generate(cd_ADD, prevEntry, term, temp);
+		}
+		else if(t == op_MINUS){
+			m_code->generate(cd_SUB, prevEntry, term, temp);
+		}
+		else{
+			m_code->generate(cd_OR, prevEntry, term, temp);
+		}
+		prevEntry = parseSimpleExpressionPrime(temp);
 	}
-	return prevEntry;
+	return temp;
 }
 
 SymbolTableEntry* Parser::parseTerm(){
-	SymbolTableEntry* entry = parseFactor();
-	entry = parseTermPrime(entry);
-	return entry;
+	SymbolTableEntry* result = parseFactor();
+	result = parseTermPrime(result);
+	return result;
 }
 
 SymbolTableEntry* Parser::parseTermPrime(SymbolTableEntry* prevEntry){
 	if(isNext(tc_MULOP)){
+		OpType t = m_currentToken->getOpType();
 		match(tc_MULOP);
-		parseFactor();
-		prevEntry = parseTermPrime(prevEntry);
+		SymbolTableEntry* factor = parseFactor();
+		SymbolTableEntry* temp = newTemp();
+		if(t == op_MULT){
+			m_code->generate(cd_MULT, prevEntry, factor, temp);
+		}
+		else if(t == op_DIVIDE){
+			m_code->generate(cd_DIVIDE, prevEntry, factor, temp);
+		}
+		else if(t == op_DIV){
+			m_code->generate(cd_DIV, prevEntry, factor, temp);
+		}
+		else if(t == op_MOD){
+			m_code->generate(cd_MOD, prevEntry, factor, temp);
+		}
+		else{
+			m_code->generate(cd_AND, prevEntry, factor, temp);
+		}
+		prevEntry = parseTermPrime(temp);
 	}
 	return prevEntry;
 }
@@ -667,7 +767,7 @@ SymbolTableEntry* Parser::parseFactor(){
 
 SymbolTableEntry* Parser::parseFactorPrime(SymbolTableEntry* prevEntry){
 	if(isNext(tc_LBRACKET)){
-		prevEntry = parseVariablePrime(prevEntry);
+		parseVariablePrime(prevEntry);
 	}
 	else if(isNext(tc_LPAREN)){
 		match(tc_LPAREN);
@@ -680,6 +780,7 @@ SymbolTableEntry* Parser::parseFactorPrime(SymbolTableEntry* prevEntry){
 //				match(tc_RPAREN);
 //			}
 		}
+		//m_code->generate(cd_CALL, prevEntry, NULL, NULL);
 	}
 	return prevEntry;
 }
@@ -701,5 +802,7 @@ SymbolTableEntry* Parser::newLabel(){
 }
 
 SymbolTableEntry* Parser::newTemp(){
-	return m_symbolTable->insert(m_code->newTemp());
+	SymbolTableEntry* var = m_symbolTable->insert(m_code->newTemp());
+	m_code->generate(cd_VAR, NULL, NULL, var);
+	return var;
 }
