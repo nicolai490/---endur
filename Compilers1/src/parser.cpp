@@ -28,7 +28,9 @@ Parser::~Parser(){
 void Parser::parse(){
 	parseProgram();
 	match(tc_EOF);
-	m_code->print();
+	if(m_totalErrors == 0){
+		m_code->print();
+	}
 }
 
 SymbolTable* Parser::getSymbolTable(){
@@ -109,6 +111,10 @@ void Parser::parseProgram(){
 //			match(tc_PROGRAM);
 //		}
 	}
+	SymbolTableEntry* start = NULL;
+	if(isNext(tc_ID)){
+		start = m_currentToken->getSymTabEntry();
+	}
 	match(tc_ID);
 	if(m_parserError){
 		TokenCode synch[] = {tc_SEMICOL, tc_NONE};
@@ -126,7 +132,6 @@ void Parser::parseProgram(){
 //		}
 	}
 	parseDeclarations();
-	SymbolTableEntry* start = newLabel();
 	m_code->generate(cd_GOTO, NULL, NULL, start);
 	parseSubprogramDeclarations();
 	m_code->generate(cd_LABEL, NULL, NULL, start);
@@ -299,8 +304,6 @@ void Parser::parseSubprogramDeclarations(){
 }
 
 void Parser::parseSubprogramDeclaration(){
-	SymbolTableEntry* lab = newLabel();
-	m_code->generate(cd_LABEL, NULL, NULL, lab);
 	parseSubprogramHead();
 	parseDeclarations();
 	parseCompoundStatement();
@@ -310,6 +313,10 @@ void Parser::parseSubprogramDeclaration(){
 void Parser::parseSubprogramHead(){
 	if(isNext(tc_FUNCTION)){
 		match(tc_FUNCTION);
+		if(isNext(tc_ID)){
+			SymbolTableEntry* start = m_currentToken->getSymTabEntry();
+			m_code->generate(cd_LABEL, NULL, NULL, start);
+		}
 		match(tc_ID);
 		if(m_parserError){
 			TokenCode synch[] = {tc_LPAREN, tc_COLON, tc_NONE};
@@ -345,6 +352,10 @@ void Parser::parseSubprogramHead(){
 //			if(isNext(tc_PROCEDURE)){
 //				match(tc_PROCEDURE);
 //			}
+		}
+		if(isNext(tc_ID)){
+			SymbolTableEntry* start = m_currentToken->getSymTabEntry();
+			m_code->generate(cd_LABEL, NULL, NULL, start);
 		}
 		match(tc_ID);
 		if(m_parserError){
